@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:oasx/api/api_client.dart';
+import 'action_path_card.dart';
 import 'package:oasx/modules/home/models/script_analysis_models.dart';
 import 'package:oasx/modules/log/log_browser_models.dart';
 import 'package:oasx/translation/i18n_content.dart';
@@ -24,13 +25,7 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
   ScriptAnalysisSnapshot? _snapshot;
   Map<String, ScriptAnalysisSnapshot> _recentSnapshots = const {};
   String _error = '';
-  bool _errorLogs = false;
-  List<ScriptErrorLogItem> _errorItems = const [];
-  String? _errorId;
   bool _loading = true;
-  bool _showClicks = true;
-  bool _showSwipes = true;
-  bool _showPath = true;
   int _revision = 0;
 
   @override
@@ -53,24 +48,6 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
       _error = '';
     });
     try {
-      if (_errorLogs) {
-        final items = <ScriptErrorLogItem>[];
-        String? cursor;
-        do {
-          final page = await ApiClient().getScriptErrorLogs(
-            scriptName: widget.scriptName, cursor: cursor,
-          );
-          if (!mounted || revision != _revision) return;
-          items.addAll(page.items);
-          final next = page.nextCursor;
-          if (!page.hasMore || next == null || next == cursor) break;
-          cursor = next;
-        } while (true);
-        _errorItems = items;
-        _errorId = items.isEmpty ? null : items.first.id;
-        await _loadAnalysis(revision);
-        return;
-      }
       final response = await ApiClient().getScriptStatisticsDates(widget.scriptName);
       if (!mounted || revision != _revision) return;
       _dates = response.dates;
@@ -93,40 +70,6 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
       _error = '';
     });
     try {
-      if (_errorLogs) {
-        var result = const ScriptAnalysisSnapshot([]);
-        if (_errorId != null) {
-          final detail = await ApiClient().getScriptErrorLogDetail(
-            _errorId!, logLimitBytes: 1048576,
-          );
-          if (!mounted || revision != _revision) return;
-          final fallbackDate = detail.time.length >= 10
-              ? detail.time.substring(0, 10)
-              : DateFormat('yyyy-MM-dd').format(
-                  DateTime.fromMillisecondsSinceEpoch(detail.timestampMs));
-          final lines = <ScriptLogLine>[];
-          var date = fallbackDate;
-          for (final text in detail.log.content.split('\n')) {
-            final match = RegExp(r'^(\d{4}-\d{2}-\d{2}) ').firstMatch(text);
-            if (match != null) date = match.group(1)!;
-            lines.add(ScriptLogLine(
-              fileName: '${date}_error.txt', lineNo: lines.length + 1,
-              offset: 0, byteLength: text.length, text: text,
-              lineTruncated: false,
-            ));
-          }
-          final dates = lines.map((line) => line.fileName.substring(0, 10)).toSet();
-          final events = dates.expand((date) => parseScriptAnalysis(lines, date).events).toList()
-            ..sort((a, b) => a.time.compareTo(b.time));
-          result = ScriptAnalysisSnapshot(events);
-          if (detail.log.truncated) {
-            _error = '错误日志过大，仅展示已读取部分的点击轨迹（最多 1 MiB）。';
-          }
-        }
-        if (!mounted || revision != _revision) return;
-        setState(() { _snapshot = result; _loading = false; });
-        return;
-      }
       final byKey = <String, ScriptLogLine>{};
       final trendDates = _dates.take(7).toList();
       final oldestRequiredDate = trendDates.isEmpty ? _dateKey : trendDates.last;
@@ -210,10 +153,10 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
               child: Center(child: Text(I18n.homeAnalysisEmpty.tr)),
             )
           else ...[
-            if (!_errorLogs) _summary(snapshot),
-            if (!_errorLogs) const SizedBox(height: 12),
-            _pathCard(snapshot),
-            if (!_errorLogs) ...[
+            _summary(snapshot),
+            const SizedBox(height: 12),
+            ActionPathCard(data: snapshot),
+            ...[
               const SizedBox(height: 12),
               _densityCard(snapshot),
               const SizedBox(height: 12),
@@ -226,26 +169,7 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
   }
 
   Widget _toolbar() {
-    return Column(children: [
-      Row(children: [
-        const Text('日志'),
-        const SizedBox(width: 8),
-        FilterChip(
-          label: const Text('错误日志'), selected: _errorLogs,
-          onSelected: (value) { _errorLogs = value; _loadDates(); },
-        ),
-      ]),
-      if (_errorLogs) Row(children: [
-        Expanded(child: DropdownButton<String>(
-          isExpanded: true, value: _errorId,
-          hint: const Text('暂无错误日志'),
-          items: _errorItems.map((item) => DropdownMenuItem(
-            value: item.id, child: Text(item.directory, overflow: TextOverflow.ellipsis),
-          )).toList(),
-          onChanged: (value) { if (value == null) return; _errorId = value; _loadAnalysis(); },
-        )),
-        IconButton(onPressed: _loadDates, icon: const Icon(Icons.refresh)),
-      ]) else Row(children: [
+    return Row(children: [
       const Icon(Icons.calendar_today_outlined, size: 18),
       const SizedBox(width: 8),
       DropdownButton<String>(
@@ -260,7 +184,6 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
       ),
       const Spacer(),
       IconButton(onPressed: _loadAnalysis, icon: const Icon(Icons.refresh)),
-    ]),
     ]);
   }
 
@@ -270,30 +193,6 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
       Text('${data.randomClickCount} ${I18n.homeAnalysisRandomClicks.tr}'),
       Text('${data.taskCount} ${I18n.homeAnalysisTasks.tr}'),
     ]);
-  }
-
-  Widget _pathCard(ScriptAnalysisSnapshot data) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(I18n.homeAnalysisPathTitle.tr, style: Theme.of(context).textTheme.titleMedium),
-          Wrap(spacing: 8, children: [
-            FilterChip(label: Text(I18n.homeAnalysisShowClicks.tr), selected: _showClicks, onSelected: (v) => setState(() => _showClicks = v)),
-            FilterChip(label: Text(I18n.homeAnalysisShowSwipes.tr), selected: _showSwipes, onSelected: (v) => setState(() => _showSwipes = v)),
-            FilterChip(label: Text(I18n.homeAnalysisShowPath.tr), selected: _showPath, onSelected: (v) => setState(() => _showPath = v)),
-          ]),
-          const SizedBox(height: 8),
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: DecoratedBox(
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerLowest, borderRadius: BorderRadius.circular(8)),
-              child: CustomPaint(painter: _ActionPathPainter(data.events, _showClicks, _showSwipes, _showPath, Theme.of(context).colorScheme)),
-            ),
-          ),
-        ]),
-      ),
-    );
   }
 
   Widget _densityCard(ScriptAnalysisSnapshot data) {
@@ -466,59 +365,4 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
           ]),
         ),
       );
-}
-
-class _ActionPathPainter extends CustomPainter {
-  _ActionPathPainter(this.events, this.showClicks, this.showSwipes, this.showPath, this.colors);
-  final List<ScriptActionEvent> events;
-  final bool showClicks;
-  final bool showSwipes;
-  final bool showPath;
-  final ColorScheme colors;
-
-  Offset _point(double x, double y, Size size) => Offset(x / 1280 * size.width, y / 720 * size.height);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final clicks = events.where((e) => e.kind == ScriptActionKind.click).toList();
-    if (showPath && clicks.length > 1) {
-      final path = Path()..moveTo(_point(clicks.first.startX, clicks.first.startY, size).dx, _point(clicks.first.startX, clicks.first.startY, size).dy);
-      for (final event in clicks.skip(1)) {
-        final point = _point(event.startX, event.startY, size);
-        path.lineTo(point.dx, point.dy);
-      }
-      canvas.drawPath(
-        path,
-        Paint()
-          ..color = colors.primary.withValues(alpha: .32)
-          ..strokeWidth = 1.5
-          ..style = PaintingStyle.stroke,
-      );
-    }
-    if (showSwipes) {
-      for (final event in events.where((e) => e.kind == ScriptActionKind.swipe)) {
-        canvas.drawLine(
-          _point(event.startX, event.startY, size),
-          _point(event.endX, event.endY, size),
-          Paint()
-            ..color = colors.tertiary.withValues(alpha: .45)
-            ..strokeWidth = 2,
-        );
-      }
-    }
-    if (showClicks) {
-      for (final event in clicks) {
-        canvas.drawCircle(
-          _point(event.startX, event.startY, size),
-          2,
-          Paint()
-            ..color = (event.isRandomClick ? colors.error : colors.primary)
-                .withValues(alpha: event.isRandomClick ? .6 : .5),
-        );
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _ActionPathPainter oldDelegate) => true;
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart'
@@ -11,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:oasx/api/api_client.dart';
 import 'package:oasx/api/sse_client.dart';
 import 'package:oasx/modules/log/log_browser_models.dart';
+import 'package:oasx/modules/log/models/error_report.dart';
 import 'package:oasx/translation/i18n_content.dart';
 import 'package:oasx/utils/browser_download_io.dart'
     if (dart.library.html) 'package:oasx/utils/browser_download_web.dart';
@@ -90,6 +92,8 @@ class ScriptLogBrowserController extends GetxController {
 
   /// Image download keys currently running.
   final downloadingImageKeys = <String>[].obs;
+  final exportingErrorReport = false.obs;
+  final errorSummaries = <String, Future<ErrorLogSummary>>{};
 
   /// Whether the error detail page is visible.
   final errorDetailVisible = false.obs;

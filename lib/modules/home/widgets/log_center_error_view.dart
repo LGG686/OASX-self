@@ -54,30 +54,33 @@ class LogCenterErrorView extends StatelessWidget {
               controller: listScrollController,
               itemCount: controller.errorItems.length,
               separatorBuilder: (context, index) {
-                return Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                );
+                return const SizedBox(height: 8);
               },
               itemBuilder: (context, index) {
                 final item = controller.errorItems[index];
-                return Obx(() {
-                  final selected = controller.selectedErrorId.value == item.id;
-                  return ListTile(
-                    dense: true,
-                    selected: selected,
-                    title: Text(
-                      item.timestampMs.toString(),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    subtitle: Text(
-                      '${_formatErrorTime(item)} · ${item.imageCount} ${I18n.homeLogImages.tr}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    onTap: () => controller.selectError(item.id),
-                  );
-                });
+                return FutureBuilder<ErrorLogSummary>(
+                  future: controller.errorSummary(item),
+                  builder: (context, snapshot) {
+                    final summary = snapshot.data;
+                    return Card(
+                      margin: EdgeInsets.zero,
+                      clipBehavior: Clip.antiAlias,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        leading: Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
+                        title: Text(summary?.task.tr ?? '正在读取任务…'),
+                        subtitle: Text('${_formatErrorTime(item)}\n${summary?.type ?? "正在识别错误类型…"}',
+                          maxLines: 3, overflow: TextOverflow.ellipsis),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => controller.selectError(item.id),
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ),

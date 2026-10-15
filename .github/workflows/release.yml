@@ -176,6 +176,11 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows app
+        # Validate the user-facing changes before packaging a release.
+        shell: pwsh
+        run: flutter test test/error_report_test.dart test/error_analysis_widget_test.dart test/script_analysis_models_test.dart
+
+      - name: Compile Windows app
         shell: pwsh
         run: |
           flutter build windows --release `

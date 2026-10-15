@@ -75,6 +75,7 @@ ScriptAnalysisSnapshot parseScriptAnalysis(
     r'^(\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})',
   );
   final taskPattern = RegExp(r'\[Task\]\s+([A-Za-z0-9_]+)\s+\(');
+  final schedulerPattern = RegExp(r'Scheduler: Start task `([^`]+)`');
   final clickPattern = RegExp(r'Click\s+\(\s*(\d+),\s*(\d+)\)\s+@\s+(.+?)\s*$');
   final swipePattern = RegExp(
     r'Swipe\s+\(\s*(\d+),\s*(\d+)\)\s*->\s*\(\s*(\d+),\s*(\d+)\)',
@@ -85,9 +86,11 @@ ScriptAnalysisSnapshot parseScriptAnalysis(
     final fileDate = line.fileName.length >= 10
         ? line.fileName.substring(0, 10)
         : '';
-    if (fileDate != dateKey) continue;
     final taskMatch = taskPattern.firstMatch(line.text);
     if (taskMatch != null) task = taskMatch.group(1)!;
+    final schedulerMatch = schedulerPattern.firstMatch(line.text);
+    if (schedulerMatch != null) task = schedulerMatch.group(1)!;
+    if (fileDate != dateKey) continue;
     final fullTimeMatch = fullTimestamp.firstMatch(line.text);
     final compactTimeMatch = compactTimestamp.firstMatch(line.text);
     final timestampText = fullTimeMatch?.group(1) ??
