@@ -9,8 +9,14 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
     if (errorSummaries.length > 256) errorSummaries.clear();
     return errorSummaries.putIfAbsent(key, () async {
       try {
-        final detail = await ApiClient().getScriptErrorLogDetail(item.id, logLimitBytes: 1048576);
-        return ErrorLogSummary.parse(detail.log.content);
+        final detail = await ApiClient().getScriptErrorLogDetail(
+          item.id,
+          logLimitBytes: 1048576,
+        );
+        return ErrorLogSummary.parse(
+          detail.log.content,
+          truncated: detail.log.truncated,
+        );
       } catch (_) {
         errorSummaries.remove(key);
         return const ErrorLogSummary('任务信息读取失败', '点击重试');
@@ -26,15 +32,27 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
     try {
       final images = <ScriptErrorImageBytes>[];
       for (final image in detail.images) {
-        images.add(await ApiClient().getScriptErrorImage(detail.id, image.name));
+        images.add(
+          await ApiClient().getScriptErrorImage(detail.id, image.name),
+        );
       }
-      final bytes = Uint8List.fromList(utf8.encode(buildErrorMarkdown(detail, images)));
+      final bytes = Uint8List.fromList(
+        utf8.encode(buildErrorMarkdown(detail, images)),
+      );
       final name = 'oasx-error-${detail.timestampMs}.md';
       if (kIsWeb) {
-        await downloadBytesToBrowser(bytes, name, mimeType: 'text/markdown;charset=utf-8');
+        await downloadBytesToBrowser(
+          bytes,
+          name,
+          mimeType: 'text/markdown;charset=utf-8',
+        );
       } else {
-        final path = await FilePicker.platform.saveFile(fileName: name,
-          type: FileType.custom, allowedExtensions: const ['md'], bytes: bytes);
+        final path = await FilePicker.platform.saveFile(
+          fileName: name,
+          type: FileType.custom,
+          allowedExtensions: const ['md'],
+          bytes: bytes,
+        );
         if (path == null || path.trim().isEmpty) return;
         if (!_isMobileTargetPlatform()) await saveBytesToPath(path, bytes);
       }
@@ -147,7 +165,10 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
     errorMessage.value = '';
     resetErrorDetailViewport?.call();
     try {
-      final detail = await ApiClient().getScriptErrorLogDetail(normalized, logLimitBytes: 1048576);
+      final detail = await ApiClient().getScriptErrorLogDetail(
+        normalized,
+        logLimitBytes: 1048576,
+      );
       if (!isErrorDetailLoadActive(requestId) ||
           selectedErrorId.value != normalized) {
         return;

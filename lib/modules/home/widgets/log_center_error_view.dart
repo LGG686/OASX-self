@@ -67,14 +67,25 @@ class LogCenterErrorView extends StatelessWidget {
                       clipBehavior: Clip.antiAlias,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
                       ),
                       child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        leading: Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        leading: Icon(
+                          Icons.error_outline,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                         title: Text(summary?.task.tr ?? '正在读取任务…'),
-                        subtitle: Text('${_formatErrorTime(item)}\n${summary?.type ?? "正在识别错误类型…"}',
-                          maxLines: 3, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(
+                          '${_formatErrorTime(item)}\n${summary?.type ?? "正在识别错误类型…"}',
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => controller.selectError(item.id),
                       ),
