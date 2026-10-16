@@ -95,6 +95,9 @@ class IllustrationService extends GetxService {
     _restartTimer();
   }
 
+  /// Start each slide's full viewing interval after its image has decoded.
+  void restartPlayback() => _restartTimer();
+
   void _restartTimer() {
     _timer?.cancel();
     _timer = null;

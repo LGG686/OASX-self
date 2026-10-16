@@ -134,7 +134,7 @@ void main() {
   );
 
   testWidgets(
-    'one image is static and an empty enabled backdrop leaves the foreground usable',
+    'one image does not rotate files and an empty enabled backdrop leaves the foreground usable',
     (tester) async {
       final directory = Directory('${root.path}/one')..createSync();
       File('${directory.path}/1.png').writeAsStringSync('catalog test');
@@ -244,6 +244,55 @@ void main() {
       expect(service.intervalSeconds.value, 60);
       expect(find.text('请输入 10–60 的整数'), findsNothing);
       service.onClose();
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+
+  testWidgets(
+    'pan reveals both edges of wide art without cropping its height',
+    (tester) async {
+      final file = File('${root.path}/wide.png');
+      await tester.runAsync(() => imageFile(file.path, Colors.blue));
+      final bytes = file.readAsBytesSync();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 320,
+              height: 160,
+              child: PanningIllustration(
+                image: MemoryImage(bytes),
+                duration: const Duration(milliseconds: 8400),
+              ),
+            ),
+          ),
+        ),
+      );
+      Image image() => tester.widget<Image>(find.byType(Image));
+      expect(image().fit, BoxFit.fitHeight);
+      expect(image().alignment, Alignment.centerLeft);
+      await tester.pump(const Duration(milliseconds: 4200));
+      expect((image().alignment as Alignment).x, closeTo(0, .01));
+      await tester.pump(const Duration(milliseconds: 4200));
+      expect(image().alignment, Alignment.centerRight);
+      final fit = applyBoxFit(
+        image().fit!,
+        const Size(960, 160),
+        const Size(320, 160),
+      );
+      expect(fit.source.height, 160);
+      expect(
+        Alignment.centerLeft
+            .inscribe(fit.source, const Rect.fromLTWH(0, 0, 960, 160))
+            .left,
+        0,
+      );
+      expect(
+        Alignment.centerRight
+            .inscribe(fit.source, const Rect.fromLTWH(0, 0, 960, 160))
+            .right,
+        960,
+      );
       await tester.pumpWidget(const SizedBox());
     },
   );

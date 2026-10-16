@@ -30,6 +30,8 @@ class IllustrationBackdrop extends StatelessWidget {
                   opacity: 1 - service.transparency.value / 100,
                   child: _IllustrationSlide(
                     path: service.currentPicture!,
+                    intervalSeconds: service.intervalSeconds.value,
+                    onReady: service.restartPlayback,
                     onInvalid: service.rejectPicture,
                   ),
                 ),
@@ -78,8 +80,15 @@ ThemeData illustrationSurfaceTheme(ThemeData theme) {
 }
 
 class _IllustrationSlide extends StatefulWidget {
-  const _IllustrationSlide({required this.path, required this.onInvalid});
+  const _IllustrationSlide({
+    required this.path,
+    required this.intervalSeconds,
+    required this.onReady,
+    required this.onInvalid,
+  });
   final String path;
+  final int intervalSeconds;
+  final VoidCallback onReady;
   final ValueChanged<String> onInvalid;
   @override
   State<_IllustrationSlide> createState() => _IllustrationSlideState();
@@ -136,6 +145,7 @@ class _IllustrationSlideState extends State<_IllustrationSlide> {
       _image = provider;
       _shownPath = path;
     });
+    widget.onReady();
   }
 
   @override
@@ -147,11 +157,39 @@ class _IllustrationSlideState extends State<_IllustrationSlide> {
     ),
     child: _image == null
         ? const SizedBox.expand()
-        : Image(
-            key: ValueKey(_shownPath),
+        : PanningIllustration(
+            key: ValueKey('$_shownPath:${widget.intervalSeconds}'),
             image: _image!,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox.expand(),
+            duration: Duration(
+              milliseconds: widget.intervalSeconds * 1000 - 1600,
+            ),
           ),
+  );
+}
+
+/// Fit the complete height, then reveal the image from its left edge to its
+/// right edge. Wide art is fully traversed before the next slide fades in.
+class PanningIllustration extends StatelessWidget {
+  const PanningIllustration({
+    super.key,
+    required this.image,
+    required this.duration,
+  });
+  final ImageProvider image;
+  final Duration duration;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+    tween: Tween(begin: -1, end: 1),
+    duration: duration,
+    curve: Curves.linear,
+    builder: (context, alignment, _) => ClipRect(
+      child: Image(
+        image: image,
+        fit: BoxFit.fitHeight,
+        alignment: Alignment(alignment, 0),
+        errorBuilder: (_, __, ___) => const SizedBox.expand(),
+      ),
+    ),
   );
 }
