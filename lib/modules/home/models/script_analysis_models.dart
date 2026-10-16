@@ -1,4 +1,5 @@
 import 'package:oasx/modules/log/log_browser_models.dart';
+import 'package:oasx/modules/log/models/log_task_context.dart';
 
 enum ScriptActionKind { click, swipe }
 
@@ -68,28 +69,29 @@ class ScriptAnalysisSnapshot {
 
 ScriptAnalysisSnapshot parseScriptAnalysis(
   Iterable<ScriptLogLine> lines,
-  String dateKey,
-) {
+  String dateKey, {
+  String? fallbackTask,
+}) {
   final fullTimestamp = RegExp(
     r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})',
   );
   final compactTimestamp = RegExp(r'^(\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})');
-  final taskPattern = RegExp(r'\[Task\]\s+([A-Za-z0-9_]+)\s+\(');
-  final schedulerPattern = RegExp(r'Scheduler: Start task `([^`]+)`');
+  final taskContext = LogTaskContext();
   final clickPattern = RegExp(r'Click\s+\(\s*(\d+),\s*(\d+)\)\s+@\s+(.+?)\s*$');
   final swipePattern = RegExp(
     r'Swipe\s+\(\s*(\d+),\s*(\d+)\)\s*->\s*\(\s*(\d+),\s*(\d+)\)',
   );
-  var task = 'Unknown';
   final events = <ScriptActionEvent>[];
   for (final line in lines) {
     final fileDate = line.fileName.length >= 10
         ? line.fileName.substring(0, 10)
         : '';
-    final taskMatch = taskPattern.firstMatch(line.text);
-    if (taskMatch != null) task = taskMatch.group(1)!;
-    final schedulerMatch = schedulerPattern.firstMatch(line.text);
-    if (schedulerMatch != null) task = schedulerMatch.group(1)!;
+    taskContext.consume(line.text);
+    final task =
+        taskContext.task ??
+        taskContext.fallbackTask ??
+        fallbackTask ??
+        'Unknown';
     if (fileDate != dateKey) continue;
     final fullTimeMatch = fullTimestamp.firstMatch(line.text);
     final compactTimeMatch = compactTimestamp.firstMatch(line.text);

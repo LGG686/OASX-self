@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:oasx/modules/home/models/script_analysis_models.dart';
 import 'package:oasx/modules/log/log_browser_models.dart';
+import 'log_task_context.dart';
 
 /// Metadata is derived from existing logs, so older backends remain compatible.
 class ErrorLogSummary {
@@ -10,17 +11,13 @@ class ErrorLogSummary {
   final String type;
 
   factory ErrorLogSummary.parse(String text, {bool truncated = false}) {
-    var task = '未知任务';
+    final tasks = LogTaskContext();
     var type = '未知错误';
-    final taskPattern = RegExp(
-      r'\[Task\]\s+(\w+)\s+\(|Scheduler: Start task `([^`]+)`',
-    );
     final exception = RegExp(
       r'^\s*(?:[\w.]+\.)?([A-Za-z_]\w*(?:Error|Exception)|KeyboardInterrupt|SystemExit):',
     );
     for (final line in const LineSplitter().convert(text)) {
-      final match = taskPattern.firstMatch(line);
-      if (match != null) task = match.group(1) ?? match.group(2)!;
+      tasks.consume(line);
       final error = exception.firstMatch(line);
       if (error != null) {
         type = error.group(1)!;
@@ -32,13 +29,16 @@ class ErrorLogSummary {
       }
     }
     return ErrorLogSummary(
-      truncated ? '日志已截断，无法确认最后任务' : task,
+      truncated
+          ? '日志已截断，无法确认最后任务'
+          : (tasks.task ?? tasks.fallbackTask ?? '未知任务'),
       truncated ? '已读取部分：$type' : type,
     );
   }
 }
 
 ScriptAnalysisSnapshot analyzeErrorLog(ScriptErrorLogDetail detail) {
+  final context = LogTaskContext();
   var date = detail.time.length >= 10
       ? detail.time.substring(0, 10)
       : DateTime.fromMillisecondsSinceEpoch(
@@ -46,6 +46,7 @@ ScriptAnalysisSnapshot analyzeErrorLog(ScriptErrorLogDetail detail) {
         ).toIso8601String().substring(0, 10);
   final lines = <ScriptLogLine>[];
   for (final text in const LineSplitter().convert(detail.log.content)) {
+    context.consume(text);
     date = RegExp(r'^(\d{4}-\d{2}-\d{2}) ').firstMatch(text)?.group(1) ?? date;
     lines.add(
       ScriptLogLine(
@@ -60,7 +61,15 @@ ScriptAnalysisSnapshot analyzeErrorLog(ScriptErrorLogDetail detail) {
   }
   final dates = lines.map((line) => line.fileName.substring(0, 10)).toSet();
   final events =
-      dates.expand((day) => parseScriptAnalysis(lines, day).events).toList()
+      dates
+          .expand(
+            (day) => parseScriptAnalysis(
+              lines,
+              day,
+              fallbackTask: context.fallbackTask,
+            ).events,
+          )
+          .toList()
         ..sort((a, b) => a.time.compareTo(b.time));
   return ScriptAnalysisSnapshot(events);
 }

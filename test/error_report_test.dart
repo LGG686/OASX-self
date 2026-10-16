@@ -24,6 +24,57 @@ ScriptErrorLogDetail detail(String text, {bool truncated = false}) =>
     );
 
 void main() {
+  test('saved error task headings survive scheduler line truncation', () {
+    final text =
+        '${'═' * 40}\n${'─' * 15} REALMRAID ${'─' * 15}\n${'═' * 40}\n'
+        '2026-10-16 00:00:00.000 | INFO | Click (10, 20) @ OK\n'
+        '${'─' * 15} GENERAL BATTLE START ${'─' * 15}\n'
+        '2026-10-16 00:00:01.000 | INFO | Click (20, 30) @ OK\n'
+        'GameStuckError: stuck';
+    expect(ErrorLogSummary.parse(text).task, 'RealmRaid');
+    expect(analyzeErrorLog(detail(text)).events.map((e) => e.task), [
+      'RealmRaid',
+      'RealmRaid',
+    ]);
+    expect(buildErrorMarkdown(detail(text), []), contains('任务：RealmRaid'));
+  });
+  test('last level-zero task heading wins, including custom task names', () {
+    final text =
+        '${'═' * 40}\n${'─' * 15} REALMRAID ${'─' * 15}\n${'═' * 40}\n'
+        '${'═' * 40}\n${'─' * 15} CUSTOMTASK ${'─' * 15}\n${'═' * 40}\n';
+    expect(ErrorLogSummary.parse(text).task, 'CUSTOMTASK');
+  });
+  test('traceback is a fallback when the heading itself is missing', () {
+    expect(
+      ErrorLogSummary.parse(
+        '  File "C:\\oas\\tasks\\RealmRaid\\script_task.py", line 20',
+      ).task,
+      'RealmRaid',
+    );
+    expect(
+      ErrorLogSummary.parse(
+        '  File "/oas/tasks/AreaBoss/script_task.py", line 20',
+      ).task,
+      'AreaBoss',
+    );
+  });
+  test('subheadings alone do not invent task names', () {
+    expect(
+      ErrorLogSummary.parse(
+        '${'─' * 15} GENERAL BATTLE START ${'─' * 15}',
+      ).task,
+      '未知任务',
+    );
+  });
+  test('traceback fallback also labels preceding clicks', () {
+    final snapshot = analyzeErrorLog(
+      detail(
+        '2026-10-16 00:00:00.000 | INFO | Click (10, 20) @ OK\n'
+        '  File "/oas/tasks/AreaBoss/script_task.py", line 20\nValueError: test',
+      ),
+    );
+    expect(snapshot.events.single.task, 'AreaBoss');
+  });
   test('last scheduled task and exception type win', () {
     final summary = ErrorLogSummary.parse(
       '[Task] First (Enable)\n'
