@@ -17,9 +17,9 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
           detail.log.content,
           truncated: detail.log.truncated,
         );
-      } catch (_) {
+      } catch (error) {
         errorSummaries.remove(key);
-        return const ErrorLogSummary('任务信息读取失败', '点击重试');
+        return ErrorLogSummary('任务信息读取失败', error.toString());
       }
     });
   }
@@ -165,9 +165,12 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
     errorMessage.value = '';
     resetErrorDetailViewport?.call();
     try {
-      final detail = await ApiClient().getScriptErrorLogDetail(
+      final fetched = await ApiClient().getScriptErrorLogDetail(
         normalized,
         logLimitBytes: 1048576,
+      );
+      final detail = fetched.withScriptName(
+        fetched.scriptName ?? selectedItem?.scriptName,
       );
       if (!isErrorDetailLoadActive(requestId) ||
           selectedErrorId.value != normalized) {

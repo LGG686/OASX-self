@@ -85,7 +85,7 @@ String buildErrorMarkdown(
   );
   final output = StringBuffer('# OASX 错误报告\n\n');
   output.writeln(
-    '- 任务：${summary.task}\n- 时间：${detail.time}\n- 错误类型：${summary.type}\n',
+    '- 配置：${detail.scriptName ?? "归属未确认"}\n- 任务：${summary.task}\n- 时间：${detail.time}\n- 错误类型：${summary.type}\n',
   );
   if (detail.log.truncated) output.writeln('> 注意：后端返回的日志已截断，以下不是完整日志。\n');
   output.writeln('## 截图\n\n图片内嵌于本文件；请使用支持 data URI 的 Markdown 阅读器。\n');

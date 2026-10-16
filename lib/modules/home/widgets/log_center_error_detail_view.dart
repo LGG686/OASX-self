@@ -64,6 +64,7 @@ class LogCenterErrorDetailView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 6),
+                        Text('配置：${detail.scriptName ?? "归属未确认"}'),
                         SelectableText(summary!.type),
                         const SizedBox(height: 12),
                         FilledButton.tonalIcon(
