@@ -27,9 +27,17 @@ class _ActionPathCardState extends State<ActionPathCard> {
   bool clicks = true, swipes = true, path = true;
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Card(
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      color: colors.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: colors.outlineVariant.withValues(alpha: .65)),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -37,34 +45,61 @@ class _ActionPathCardState extends State<ActionPathCard> {
               I18n.homeAnalysisPathTitle.tr,
               style: Theme.of(context).textTheme.titleMedium,
             ),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 8,
+              runSpacing: 6,
               children: [
                 FilterChip(
                   label: Text(I18n.homeAnalysisShowClicks.tr),
                   selected: clicks,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  side: BorderSide(
+                    color: colors.outlineVariant.withValues(alpha: .65),
+                  ),
                   onSelected: (v) => setState(() => clicks = v),
                 ),
                 FilterChip(
                   label: Text(I18n.homeAnalysisShowSwipes.tr),
                   selected: swipes,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  side: BorderSide(
+                    color: colors.outlineVariant.withValues(alpha: .65),
+                  ),
                   onSelected: (v) => setState(() => swipes = v),
                 ),
                 FilterChip(
                   label: Text(I18n.homeAnalysisShowPath.tr),
                   selected: path,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  side: BorderSide(
+                    color: colors.outlineVariant.withValues(alpha: .65),
+                  ),
                   onSelected: (v) => setState(() => path = v),
                 ),
               ],
             ),
+            const SizedBox(height: 12),
             if (widget.data.events.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text('此错误日志中没有可识别的点击或滑动记录'),
               )
             else
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+              Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: colors.outlineVariant.withValues(alpha: .65),
+                  ),
+                ),
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: ColoredBox(
@@ -82,6 +117,7 @@ class _ActionPathCardState extends State<ActionPathCard> {
                   ),
                 ),
               ),
+            if (widget.colorByTask) const SizedBox(height: 12),
             if (widget.colorByTask)
               Wrap(
                 spacing: 12,
@@ -89,13 +125,32 @@ class _ActionPathCardState extends State<ActionPathCard> {
                 children: [
                   for (final task
                       in widget.data.events.map((e) => e.task).toSet())
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.circle, size: 8, color: taskPathColor(task)),
-                        const SizedBox(width: 4),
-                        Text(task.tr),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: taskPathColor(task).withValues(alpha: .08),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 7,
+                            color: taskPathColor(task),
+                          ),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              task.tr,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                 ],
               ),
@@ -148,8 +203,10 @@ class _ActionPathPainter extends CustomPainter {
       canvas.drawPath(
         path,
         Paint()
-          ..color = colors.primary.withValues(alpha: .32)
-          ..strokeWidth = 1.5
+          ..color = colors.primary.withValues(alpha: colorByTask ? .24 : .32)
+          ..strokeWidth = colorByTask ? .7 : 1.5
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
           ..style = PaintingStyle.stroke,
       );
     }
@@ -162,7 +219,8 @@ class _ActionPathPainter extends CustomPainter {
           _point(event.endX, event.endY, size),
           Paint()
             ..color = colors.tertiary.withValues(alpha: .45)
-            ..strokeWidth = 2,
+            ..strokeWidth = colorByTask ? 1 : 2
+            ..strokeCap = StrokeCap.round,
         );
       }
     }

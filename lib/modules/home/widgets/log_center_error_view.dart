@@ -89,11 +89,15 @@ class LogCenterErrorView extends StatelessWidget {
                     final summary = snapshot.data;
                     return Card(
                       margin: EdgeInsets.zero,
+                      elevation: 0,
+                      color: Theme.of(context).colorScheme.surfaceContainerLow,
                       clipBehavior: Clip.antiAlias,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(20),
                         side: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.error.withValues(alpha: .2),
                         ),
                       ),
                       child: ListTile(
@@ -101,9 +105,19 @@ class LogCenterErrorView extends StatelessWidget {
                           horizontal: 14,
                           vertical: 8,
                         ),
-                        leading: Icon(
-                          Icons.error_outline,
-                          color: Theme.of(context).colorScheme.error,
+                        leading: Container(
+                          padding: const EdgeInsets.all(9),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.error.withValues(alpha: .08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.error_outline_rounded,
+                            color: Theme.of(context).colorScheme.error,
+                            size: 22,
+                          ),
                         ),
                         title: Text(summary?.task.tr ?? '正在读取任务…'),
                         subtitle: Text(
@@ -111,7 +125,10 @@ class LogCenterErrorView extends StatelessWidget {
                           maxLines: 4,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        trailing: const Icon(Icons.chevron_right),
+                        trailing: const Icon(
+                          Icons.chevron_right_rounded,
+                          size: 20,
+                        ),
                         onTap: () => controller.selectError(item.id),
                       ),
                     );
@@ -129,7 +146,12 @@ class LogCenterErrorView extends StatelessWidget {
   Widget _buildLoadMore(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: TextButton(
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
         onPressed: () => controller.loadErrorList(),
         child: Text(I18n.homeLogLoadOlder.tr),
       ),

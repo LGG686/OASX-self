@@ -13,6 +13,8 @@ class ErrorLogSummary {
   factory ErrorLogSummary.parse(String text, {bool truncated = false}) {
     final tasks = LogTaskContext();
     var type = '未知错误';
+    String? errorTask;
+    var sawError = false;
     final exception = RegExp(
       r'^\s*(?:[\w.]+\.)?([A-Za-z_]\w*(?:Error|Exception)|KeyboardInterrupt|SystemExit):',
     );
@@ -21,19 +23,53 @@ class ErrorLogSummary {
       final error = exception.firstMatch(line);
       if (error != null) {
         type = error.group(1)!;
-      } else if (type == '未知错误') {
+        errorTask = tasks.task ?? tasks.fallbackTask;
+        sawError = true;
+      } else {
         final level = RegExp(
           r'\|\s*(ERROR|CRITICAL)\s*\|\s*(.+)',
         ).firstMatch(line);
-        if (level != null) type = level.group(2)!.trim();
+        if (level != null) {
+          if (type == '未知错误') type = level.group(2)!.trim();
+          errorTask = tasks.task ?? tasks.fallbackTask;
+          sawError = true;
+        }
       }
     }
     return ErrorLogSummary(
       truncated
           ? '日志已截断，无法确认最后任务'
-          : (tasks.task ?? tasks.fallbackTask ?? '未知任务'),
+          : ((sawError ? errorTask : tasks.task ?? tasks.fallbackTask) ??
+                '未知任务'),
       truncated ? '已读取部分：$type' : type,
     );
+  }
+}
+
+/// Redacted values and optional argument labels, fetched only when exporting.
+class ErrorTaskSettings {
+  const ErrorTaskSettings(this.values, {this.schema = const {}});
+  final Map<String, dynamic> values;
+  final Map<String, dynamic> schema;
+}
+
+Future<ErrorTaskSettings> loadErrorTaskSettings(
+  ScriptErrorLogDetail detail, {
+  required Future<ErrorTaskSettings> Function(String config, String task) load,
+}) async {
+  final summary = ErrorLogSummary.parse(
+    detail.log.content,
+    truncated: detail.log.truncated,
+  );
+  final config = detail.scriptName?.trim() ?? '';
+  if (config.isEmpty || detail.log.truncated || summary.task == '未知任务') {
+    return const ErrorTaskSettings({});
+  }
+  try {
+    return await load(config, summary.task);
+  } catch (_) {
+    // Missing tasks, deleted configs and older backends leave this section empty.
+    return const ErrorTaskSettings({});
   }
 }
 
@@ -77,8 +113,11 @@ ScriptAnalysisSnapshot analyzeErrorLog(ScriptErrorLogDetail detail) {
 /// Called only by the explicit export action. Images travel inside the .md file.
 String buildErrorMarkdown(
   ScriptErrorLogDetail detail,
-  List<ScriptErrorImageBytes> images,
-) {
+  List<ScriptErrorImageBytes> images, {
+  bool includeTaskSettings = false,
+  ErrorTaskSettings taskSettings = const ErrorTaskSettings({}),
+  String Function(String)? translate,
+}) {
   final summary = ErrorLogSummary.parse(
     detail.log.content,
     truncated: detail.log.truncated,
@@ -88,6 +127,32 @@ String buildErrorMarkdown(
     '- 配置：${detail.scriptName ?? "归属未确认"}\n- 任务：${summary.task}\n- 时间：${detail.time}\n- 错误类型：${summary.type}\n',
   );
   if (detail.log.truncated) output.writeln('> 注意：后端返回的日志已截断，以下不是完整日志。\n');
+  if (includeTaskSettings) {
+    output.writeln('## 任务详细设置\n');
+    output.writeln('> 以下为导出时保存的任务设置（已脱敏），不是报错时的历史快照。\n');
+    String label(String value) => translate?.call(value) ?? value;
+    for (final group in taskSettings.values.entries) {
+      if (group.value is! Map || (group.value as Map).isEmpty) continue;
+      output.writeln('### ${_tableText(label(group.key))}\n');
+      output.writeln('| 设置项 | 当前值 |\n| :--- | :--- |');
+      final schema = taskSettings.schema[group.key];
+      for (final entry in (group.value as Map).entries) {
+        var title = entry.key.toString();
+        if (schema is List) {
+          for (final argument in schema.whereType<Map>()) {
+            if (argument['name'] == entry.key) {
+              title = argument['title']?.toString() ?? title;
+              break;
+            }
+          }
+        }
+        output.writeln(
+          '| ${_tableText(label(title))} | ${_tableText(_settingValue(entry.value, label))} |',
+        );
+      }
+      output.writeln();
+    }
+  }
   output.writeln('## 截图\n\n图片内嵌于本文件；请使用支持 data URI 的 Markdown 阅读器。\n');
   for (var i = 0; i < images.length; i++) {
     output.writeln(
@@ -101,4 +166,32 @@ String buildErrorMarkdown(
   }
   output.writeln('## 日志\n\n${fence}text\n${detail.log.content}\n$fence');
   return output.toString();
+}
+
+String _tableText(String value) => value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('\\', '&#92;')
+    .replaceAll('|', '&#124;')
+    .replaceAll('`', '&#96;')
+    .replaceAll('*', '&#42;')
+    .replaceAll('_', '&#95;')
+    .replaceAll('[', '&#91;')
+    .replaceAll(']', '&#93;')
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\n', '<br>');
+
+String _settingValue(dynamic value, String Function(String) label) {
+  if (value == null) return '';
+  if (value is bool) return value ? '开启' : '关闭';
+  if (value is List) return value.map((v) => _settingValue(v, label)).join('、');
+  if (value is Map) {
+    return value.entries
+        .map(
+          (e) => '${label(e.key.toString())}：${_settingValue(e.value, label)}',
+        )
+        .join('\n');
+  }
+  return label(value.toString());
 }

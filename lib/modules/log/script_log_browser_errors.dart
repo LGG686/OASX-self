@@ -28,8 +28,40 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
   Future<void> exportErrorReport() async {
     final detail = selectedErrorDetail.value;
     if (detail == null || exportingErrorReport.value) return;
+    final attachSettings = includeErrorTaskSettings.value;
     exportingErrorReport.value = true;
     try {
+      final settings = attachSettings
+          ? await loadErrorTaskSettings(
+              detail,
+              load: (config, task) async {
+                final exported = await ApiClient().exportTaskJson(
+                  configName: config,
+                  taskName: task,
+                );
+                final payload = jsonDecode(utf8.decode(exported.bytes));
+                if (payload is! Map ||
+                    payload.length != 1 ||
+                    payload.values.single is! Map) {
+                  return const ErrorTaskSettings({});
+                }
+                Map<String, dynamic> schema = {};
+                try {
+                  schema = await ApiClient().getScriptTask(
+                    config,
+                    task,
+                    fresh: true,
+                  );
+                } catch (_) {
+                  // Labels are optional; redacted values can still be rendered.
+                }
+                return ErrorTaskSettings(
+                  Map<String, dynamic>.from(payload.values.single as Map),
+                  schema: schema,
+                );
+              },
+            )
+          : const ErrorTaskSettings({});
       final images = <ScriptErrorImageBytes>[];
       for (final image in detail.images) {
         images.add(
@@ -37,7 +69,15 @@ extension ScriptLogBrowserErrorsX on ScriptLogBrowserController {
         );
       }
       final bytes = Uint8List.fromList(
-        utf8.encode(buildErrorMarkdown(detail, images)),
+        utf8.encode(
+          buildErrorMarkdown(
+            detail,
+            images,
+            includeTaskSettings: attachSettings,
+            taskSettings: settings,
+            translate: (text) => text.tr,
+          ),
+        ),
       );
       final name = 'oasx-error-${detail.timestampMs}.md';
       if (kIsWeb) {

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart'
@@ -93,6 +92,7 @@ class ScriptLogBrowserController extends GetxController {
   /// Image download keys currently running.
   final downloadingImageKeys = <String>[].obs;
   final exportingErrorReport = false.obs;
+  final includeErrorTaskSettings = false.obs;
   final errorSummaries = <String, Future<ErrorLogSummary>>{};
 
   /// Whether the error detail page is visible.
