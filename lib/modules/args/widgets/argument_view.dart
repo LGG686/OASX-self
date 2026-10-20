@@ -9,6 +9,8 @@ class ArgumentView extends StatefulWidget {
     Key? key,
     this.scriptName,
     this.taskName,
+    this.compact = false,
+    this.label,
   }) : super(key: key);
 
   final SetArgumentCallback setArgument;
@@ -17,6 +19,8 @@ class ArgumentView extends StatefulWidget {
   final bool lockImmediateScheduling;
   final String? scriptName;
   final String? taskName;
+  final bool compact;
+  final String? label;
 
   @override
   State<ArgumentView> createState() => _ArgumentViewState();
@@ -66,6 +70,18 @@ class _ArgumentViewState extends State<ArgumentView> {
       _syncTextController();
       final title = _title();
       final form = _buildFormSection();
+      if (widget.compact) {
+        return Tooltip(
+          message: model.description?.tr ?? '',
+          child: Row(
+            children: [
+              Flexible(child: Text('${widget.label ?? model.title.tr}：')),
+              const SizedBox(width: 6),
+              Expanded(child: form),
+            ],
+          ),
+        );
+      }
       if (landscape) {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,96 +117,94 @@ class _ArgumentViewState extends State<ArgumentView> {
   }
 
   Widget _buildFormSection() {
-    final errorText =
-        _argsController.fieldError(widget.getGroupName(), model.title);
+    final errorText = _argsController.fieldError(
+      widget.getGroupName(),
+      model.title,
+    );
     final isLocked = _isProtectedImmediateScheduleField;
     final child = switch (model.type) {
       'boolean' => Checkbox(
-          value: model.value,
-          onChanged: isLocked ? null : onCheckboxChanged,
-        ).alignment(Alignment.centerLeft),
+        value: model.value,
+        onChanged: isLocked ? null : onCheckboxChanged,
+      ).alignment(Alignment.centerLeft),
       'string' => _buildTextField(errorText: errorText, enabled: !isLocked),
       'multi_line' => _buildTextField(
-          errorText: errorText,
-          maxLines: null,
-          enabled: !isLocked,
-        ),
+        errorText: errorText,
+        maxLines: null,
+        enabled: !isLocked,
+      ),
       'number' => _buildTextField(
-          errorText: errorText,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp('[-0-9.]')),
-          ],
-          onChanged: _scheduleNumberChange,
-          enabled: !isLocked,
-        ),
+        errorText: errorText,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[-0-9.]'))],
+        onChanged: _scheduleNumberChange,
+        enabled: !isLocked,
+      ),
       'integer' => _buildTextField(
-          errorText: errorText,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp('[-0-9]')),
-          ],
-          onChanged: _scheduleIntegerChange,
-          enabled: !isLocked,
-        ),
+        errorText: errorText,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[-0-9]'))],
+        onChanged: _scheduleIntegerChange,
+        enabled: !isLocked,
+      ),
       'enum' => DropdownButtonFormField<String>(
-          initialValue: model.value.toString(),
-          isExpanded: true,
-          menuMaxHeight: Get.height * 0.5,
-          decoration: InputDecoration(errorText: errorText),
-          items: model.enumEnum!
-              .map<DropdownMenuItem<String>>(
-                (e) => DropdownMenuItem(
-                  value: e.toString(),
-                  child: Text(
-                    e.toString().tr,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+        initialValue: model.value.toString(),
+        isExpanded: true,
+        menuMaxHeight: Get.height * 0.5,
+        decoration: InputDecoration(errorText: errorText),
+        items: model.enumEnum!
+            .map<DropdownMenuItem<String>>(
+              (e) => DropdownMenuItem(
+                value: e.toString(),
+                child: Text(
+                  e.toString().tr,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              )
-              .toList(),
-          selectedItemBuilder: (context) => model.enumEnum!
-              .map<Widget>(
-                (e) => Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    e.toString().tr,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+              ),
+            )
+            .toList(),
+        selectedItemBuilder: (context) => model.enumEnum!
+            .map<Widget>(
+              (e) => Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  e.toString().tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
-              )
-              .toList(),
-          onChanged: isLocked ? null : onEnumChanged,
-        ),
+              ),
+            )
+            .toList(),
+        onChanged: isLocked ? null : onEnumChanged,
+      ),
       'multi_enum' => MultiEnumDropdown(
-          value: ArgumentModel.normalizeMultiEnumValue(model.value),
-          options: model.enumEnum ?? const <String>[],
-          errorText: errorText,
-          enabled: !isLocked,
-          onChanged: onMultiEnumChanged,
-        ),
+        value: ArgumentModel.normalizeMultiEnumValue(model.value),
+        options: model.enumEnum ?? const <String>[],
+        errorText: errorText,
+        enabled: !isLocked,
+        onChanged: onMultiEnumChanged,
+      ),
       'date_time' => _buildPicker(
-          DateTimePicker(value: model.value, onChange: onDateTimeChanged),
-          errorText,
-          enabled: !isLocked,
-        ),
+        DateTimePicker(value: model.value, onChange: onDateTimeChanged),
+        errorText,
+        enabled: !isLocked,
+      ),
       'time_delta' => _buildPicker(
-          TimeDeltaPicker(
-            value: ensureTimeDeltaString(model.value),
-            onChange: onTimeDeltaChanged,
-          ),
-          errorText,
-          enabled: !isLocked,
+        TimeDeltaPicker(
+          value: ensureTimeDeltaString(model.value),
+          onChange: onTimeDeltaChanged,
         ),
+        errorText,
+        enabled: !isLocked,
+      ),
       'time' => _buildPicker(
-          TimePicker(value: model.value, onChange: onTimeChanged),
-          errorText,
-          enabled: !isLocked,
-        ),
+        TimePicker(value: model.value, onChange: onTimeChanged),
+        errorText,
+        enabled: !isLocked,
+      ),
       _ => Text(model.value.toString()),
     };
     return child;
@@ -219,11 +233,11 @@ class _ArgumentViewState extends State<ArgumentView> {
         right: 12,
         bottom: keyboardInset > 0 ? keyboardInset + 24 : 24,
       ),
-      textInputAction:
-          isSingleLine ? TextInputAction.done : TextInputAction.newline,
+      textInputAction: isSingleLine
+          ? TextInputAction.done
+          : TextInputAction.newline,
       decoration: InputDecoration(errorText: errorText),
-      onTapOutside:
-          PlatformUtils.isWeb ? null : (_) => _focusNode.unfocus(),
+      onTapOutside: PlatformUtils.isWeb ? null : (_) => _focusNode.unfocus(),
       onEditingComplete: PlatformUtils.isWeb
           ? null
           : (isSingleLine ? _focusNode.unfocus : null),
@@ -231,11 +245,7 @@ class _ArgumentViewState extends State<ArgumentView> {
     );
   }
 
-  Widget _buildPicker(
-    Widget picker,
-    String? errorText, {
-    bool enabled = true,
-  }) {
+  Widget _buildPicker(Widget picker, String? errorText, {bool enabled = true}) {
     return IgnorePointer(
       ignoring: !enabled,
       child: Opacity(
@@ -274,19 +284,25 @@ class _ArgumentViewState extends State<ArgumentView> {
 
   void _scheduleStringChange(String value) {
     timer?.cancel();
-    timer =
-        Timer(const Duration(milliseconds: 150), () => onStringChanged(value));
+    timer = Timer(
+      const Duration(milliseconds: 150),
+      () => onStringChanged(value),
+    );
   }
 
   void _scheduleNumberChange(String value) {
     timer?.cancel();
-    timer =
-        Timer(const Duration(milliseconds: 150), () => onNumberChanged(value));
+    timer = Timer(
+      const Duration(milliseconds: 150),
+      () => onNumberChanged(value),
+    );
   }
 
   void _scheduleIntegerChange(String value) {
     timer?.cancel();
-    timer =
-        Timer(const Duration(milliseconds: 150), () => onIntegerChanged(value));
+    timer = Timer(
+      const Duration(milliseconds: 150),
+      () => onIntegerChanged(value),
+    );
   }
 }
