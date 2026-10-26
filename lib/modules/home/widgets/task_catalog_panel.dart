@@ -18,6 +18,8 @@ class TaskCatalogPanel extends StatefulWidget {
     required this.onOpenTask,
     required this.onQuickRun,
     required this.onQuickWait,
+    this.gridLayout = false,
+    this.inlineParameters = true,
   });
 
   final HomeDashboardController controller;
@@ -25,6 +27,8 @@ class TaskCatalogPanel extends StatefulWidget {
   final Future<void> Function(String taskName) onOpenTask;
   final Future<void> Function(String taskName) onQuickRun;
   final Future<void> Function(String taskName) onQuickWait;
+  final bool gridLayout;
+  final bool inlineParameters;
 
   @override
   State<TaskCatalogPanel> createState() => _TaskCatalogPanelState();
@@ -69,6 +73,9 @@ class _TaskCatalogPanelState extends State<TaskCatalogPanel> {
       final activeTask = widget.controller.activeTaskName.value.trim();
       final dragPayload = widget.controller.activeDragPayload.value;
       final quickScheduleLocked = widget.controller.isBulkQuickScheduling;
+      if (!widget.inlineParameters) {
+        return _buildTaskList(context, dragPayload, quickScheduleLocked);
+      }
       return IndexedStack(
         index: activeTask.isEmpty ? 0 : 1,
         children: [
@@ -148,6 +155,7 @@ class _TaskCatalogPanelState extends State<TaskCatalogPanel> {
                   quickScheduleLocked: quickScheduleLocked,
                   dragEnabled: widget.controller.canUseDesktopDragCopy,
                   activeDragPayload: dragPayload,
+                  gridLayout: widget.gridLayout,
                 ),
               );
             },
@@ -415,6 +423,7 @@ class _CatalogTaskRow extends StatelessWidget {
     required this.quickScheduleLocked,
     required this.dragEnabled,
     required this.activeDragPayload,
+    this.compact = false,
   });
 
   final HomeDashboardController controller;
@@ -429,6 +438,7 @@ class _CatalogTaskRow extends StatelessWidget {
   final bool quickScheduleLocked;
   final bool dragEnabled;
   final ConfigDragPayload? activeDragPayload;
+  final bool compact;
   static const _actionExtent = 132.0;
   static const _minRowHeight = 40.0;
 
@@ -455,6 +465,76 @@ class _CatalogTaskRow extends StatelessWidget {
       softWrap: false,
       style: Theme.of(context).textTheme.bodyLarge,
     );
+    if (compact) {
+      final label = Text(
+        task.name.tr,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.bodySmall,
+      );
+      return Material(
+        color:
+            (task.enabled
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : Theme.of(context).colorScheme.surfaceContainerHigh)
+                .withValues(alpha: .16),
+        borderRadius: BorderRadius.circular(9),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(9),
+          onTap: () => onOpenTask(task.name),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Row(
+              children: [
+                if (supportsEnable)
+                  _EnableIcon(
+                    enabled: task.enabled,
+                    loading: loading,
+                    onTap: onToggleEnabled,
+                  ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: dragEnabled
+                      ? Draggable<ConfigDragPayload>(
+                          data: payload,
+                          feedback: DragCopyFeedback(
+                            label: payload.displayLabel,
+                          ),
+                          onDragStarted: () =>
+                              controller.startConfigDrag(payload),
+                          onDragEnd: (_) => controller.clearConfigDrag(),
+                          child: label,
+                        )
+                      : label,
+                ),
+                for (final quickRun in [true, false])
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 26,
+                      height: 30,
+                    ),
+                    iconSize: 15,
+                    tooltip:
+                        (quickRun ? I18n.homeQuickRun : I18n.homeQuickWait).tr,
+                    onPressed:
+                        !quickScheduleLocked && canQuickScheduleTask(task.name)
+                        ? () => quickRun
+                              ? onQuickRun(task.name)
+                              : onQuickWait(task.name)
+                        : null,
+                    icon: Icon(
+                      quickRun
+                          ? Icons.flash_on_rounded
+                          : Icons.schedule_rounded,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: AnimatedContainer(
@@ -564,6 +644,7 @@ class _CatalogSectionCard extends StatelessWidget {
     required this.quickScheduleLocked,
     required this.dragEnabled,
     required this.activeDragPayload,
+    this.gridLayout = false,
   });
 
   final HomeDashboardController controller;
@@ -582,6 +663,26 @@ class _CatalogSectionCard extends StatelessWidget {
   final bool quickScheduleLocked;
   final bool dragEnabled;
   final ConfigDragPayload? activeDragPayload;
+  final bool gridLayout;
+
+  Widget _gridTask(int index) {
+    final task = section.tasks[index];
+    return _CatalogTaskRow(
+      controller: controller,
+      sourceScriptName: sourceScriptName,
+      task: task,
+      loading: togglingTasks.contains(task.name),
+      onToggleEnabled: (value) => onToggleEnabled(task, value),
+      onOpenTask: onOpenTask,
+      onQuickRun: onQuickRun,
+      onQuickWait: onQuickWait,
+      canQuickScheduleTask: canQuickScheduleTask,
+      quickScheduleLocked: quickScheduleLocked,
+      dragEnabled: dragEnabled,
+      activeDragPayload: activeDragPayload,
+      compact: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -641,34 +742,50 @@ class _CatalogSectionCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: Column(
-                children: [
-                  for (
-                    int index = 0;
-                    index < section.tasks.length;
-                    index++
-                  ) ...[
-                    if (index > 0) const Divider(height: 1),
-                    _CatalogTaskRow(
-                      controller: controller,
-                      sourceScriptName: sourceScriptName,
-                      task: section.tasks[index],
-                      loading: togglingTasks.contains(
-                        section.tasks[index].name,
+              child: gridLayout
+                  ? LayoutBuilder(
+                      builder: (context, constraints) => GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(top: 8),
+                        itemCount: section.tasks.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: constraints.maxWidth >= 270 ? 2 : 1,
+                          mainAxisExtent: 42,
+                          mainAxisSpacing: 6,
+                          crossAxisSpacing: 6,
+                        ),
+                        itemBuilder: (context, index) => _gridTask(index),
                       ),
-                      onToggleEnabled: (value) =>
-                          onToggleEnabled(section.tasks[index], value),
-                      onOpenTask: onOpenTask,
-                      onQuickRun: onQuickRun,
-                      onQuickWait: onQuickWait,
-                      canQuickScheduleTask: canQuickScheduleTask,
-                      quickScheduleLocked: quickScheduleLocked,
-                      dragEnabled: dragEnabled,
-                      activeDragPayload: activeDragPayload,
+                    )
+                  : Column(
+                      children: [
+                        for (
+                          int index = 0;
+                          index < section.tasks.length;
+                          index++
+                        ) ...[
+                          if (index > 0) const Divider(height: 1),
+                          _CatalogTaskRow(
+                            controller: controller,
+                            sourceScriptName: sourceScriptName,
+                            task: section.tasks[index],
+                            loading: togglingTasks.contains(
+                              section.tasks[index].name,
+                            ),
+                            onToggleEnabled: (value) =>
+                                onToggleEnabled(section.tasks[index], value),
+                            onOpenTask: onOpenTask,
+                            onQuickRun: onQuickRun,
+                            onQuickWait: onQuickWait,
+                            canQuickScheduleTask: canQuickScheduleTask,
+                            quickScheduleLocked: quickScheduleLocked,
+                            dragEnabled: dragEnabled,
+                            activeDragPayload: activeDragPayload,
+                          ),
+                        ],
+                      ],
                     ),
-                  ],
-                ],
-              ),
             ),
           ],
         ],

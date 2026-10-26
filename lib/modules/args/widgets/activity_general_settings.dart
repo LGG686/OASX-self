@@ -219,20 +219,27 @@ class _ActivitySequenceBoardState extends State<ActivitySequenceBoard> {
   Widget tile(String name, {bool placeholder = false}) {
     final colors = Theme.of(context).colorScheme;
     return Container(
-      height: 42,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: placeholder
             ? colors.surfaceContainerHighest.withValues(alpha: .3)
             : colors.secondaryContainer,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: colors.outlineVariant),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          if (!placeholder) const Icon(Icons.drag_indicator, size: 16),
-          Flexible(child: Text(name, overflow: TextOverflow.ellipsis)),
+          if (!placeholder)
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Icon(Icons.drag_indicator, size: 16),
+            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Text(name, overflow: TextOverflow.ellipsis),
+          ),
         ],
       ),
     );
@@ -283,7 +290,7 @@ class _ActivitySequenceBoardState extends State<ActivitySequenceBoard> {
   Widget build(BuildContext context) {
     final enabled = selected;
     return SizedBox(
-      height: 40 + widget.options.length * 48.0,
+      height: 20 + widget.options.length * 38.0,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -292,14 +299,14 @@ class _ActivitySequenceBoardState extends State<ActivitySequenceBoard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.title),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 for (var row = 0; row < (widget.options.length + 1) ~/ 2; row++)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.only(bottom: 6),
                     child: Row(
                       children: [
                         for (var col = 0; col < 2; col++) ...[
-                          if (col > 0) const SizedBox(width: 10),
+                          if (col > 0) const SizedBox(width: 6),
                           Expanded(
                             child: row * 2 + col >= widget.options.length
                                 ? const SizedBox.shrink()
@@ -322,13 +329,13 @@ class _ActivitySequenceBoardState extends State<ActivitySequenceBoard> {
               ],
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 10),
           Expanded(
             child: Container(
               key: _listKey,
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.outlineVariant,
                 ),
@@ -339,7 +346,7 @@ class _ActivitySequenceBoardState extends State<ActivitySequenceBoard> {
                     dropSlot(
                       i,
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.only(bottom: 4),
                         child: draggable(enabled[i], active: true),
                       ),
                     ),

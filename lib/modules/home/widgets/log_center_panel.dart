@@ -20,10 +20,17 @@ part 'log_center_panel_scroll.dart';
 /// Script log center backed by the `/logs` browser API.
 class LogCenterPanel extends StatefulWidget {
   /// Creates one script log center.
-  const LogCenterPanel({super.key, required this.scriptName});
+  const LogCenterPanel({
+    super.key,
+    required this.scriptName,
+    this.header,
+    this.headerExtent,
+  });
 
   /// Active script name.
   final String scriptName;
+  final Widget? header;
+  final double? headerExtent;
 
   @override
   State<LogCenterPanel> createState() => _LogCenterPanelState();
@@ -93,6 +100,44 @@ class _LogCenterPanelState extends State<LogCenterPanel> {
     if (controller == null) {
       return Card(child: Center(child: Text(I18n.homeNoLog.tr)));
     }
+    if (widget.headerExtent != null) {
+      return Column(
+        children: [
+          SizedBox(
+            height: widget.headerExtent,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.header != null) widget.header!,
+                    Expanded(
+                      child: Center(
+                        child: LogCenterToolbar(
+                          controller: controller,
+                          onToggleLineWrap: () =>
+                              _handleLogCenterLineWrapToggle(this),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: _logContents(controller),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -128,6 +173,23 @@ class _LogCenterPanelState extends State<LogCenterPanel> {
       ),
     );
   }
+
+  Widget _logContents(ScriptLogBrowserController controller) => Obx(
+    () => controller.activeTab.value == ScriptLogBrowserTab.info
+        ? LogCenterInfoView(
+            controller: controller,
+            scrollController: _scrollController!,
+            horizontalScrollController: _horizontalScrollController!,
+            onScrollNotification: _handleScrollNotification,
+          )
+        : LogCenterErrorView(
+            controller: controller,
+            listScrollController: _errorListScrollController!,
+            detailScrollController: _errorDetailScrollController!,
+            detailHorizontalScrollController:
+                _errorDetailHorizontalScrollController!,
+          ),
+  );
 
   void _bindController(String scriptName) {
     final normalized = scriptName.trim();

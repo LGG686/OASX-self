@@ -7,6 +7,7 @@ import 'package:oasx/modules/home/models/home_workbench_layout.dart';
 import 'package:oasx/modules/home/widgets/active_config_panel.dart';
 import 'package:oasx/modules/home/widgets/config_collection_panel.dart';
 import 'package:oasx/modules/home/widgets/home_workbench_body.dart';
+import 'package:oasx/modules/home/widgets/desktop_workbench.dart';
 import 'package:oasx/modules/home/widgets/workbench_sidebar_panel.dart';
 import 'package:oasx/service/script_service.dart';
 import 'package:oasx/translation/i18n_content.dart';
@@ -31,7 +32,7 @@ class ConfigWorkbench extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeWorkbenchBody(
+    final legacy = HomeWorkbenchBody(
       controller: controller,
       collectionBuilder: (layoutMode) => ConfigCollectionPanel(
         controller: controller,
@@ -80,6 +81,38 @@ class ConfigWorkbench extends StatelessWidget {
           scriptName: controller.activeScriptName.value,
         );
       }),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 850 || constraints.maxHeight < 540) {
+          return legacy;
+        }
+        return DesktopWorkbench(
+          controller: controller,
+          legacy: legacy,
+          loadingAddScript: loadingAddScript,
+          refreshingScripts: refreshingScripts,
+          onAddScript: onAddScriptTap,
+          onRefreshScripts: onRefreshScriptsTap,
+          onActivateScript: (name) =>
+              _activateScript(context, name, HomeWorkbenchLayoutMode.threePane),
+          onTogglePower: (name, enable) => controller.applySelectionPowerToggle(
+            sourceScript: name,
+            enable: enable,
+          ),
+          onRenameScript: (name) => _renameScript(context, name),
+          onExportScript: _exportScript,
+          onDeleteScript: (name) => _deleteScript(context, name),
+          onOpenTask: (task, source) =>
+              _openTaskFromSource(context, task, source),
+          onSetNextRun: _setTaskNextRun,
+          onQuickRun: (task) => _quickSchedule(task, true),
+          onQuickWait: (task) => _quickSchedule(task, false),
+          onBulkQuickRun: () => _bulkQuickSchedule(true),
+          onBulkQuickWait: () => _bulkQuickSchedule(false),
+          onChangeTab: (tab) => _changeTab(context, tab),
+        );
+      },
     );
   }
 

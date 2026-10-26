@@ -7,6 +7,7 @@ class _TaskMeta extends StatelessWidget {
     required this.task,
     required this.onSetNextRun,
     required this.dragEnabled,
+    this.compact = false,
   });
 
   final HomeDashboardController controller;
@@ -14,6 +15,7 @@ class _TaskMeta extends StatelessWidget {
   final TaskStatusViewData task;
   final Future<void> Function(String taskName, String nextRun) onSetNextRun;
   final bool dragEnabled;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,37 @@ class _TaskMeta extends StatelessWidget {
       softWrap: false,
       style: Theme.of(context).textTheme.labelLarge,
     );
+    if (compact) {
+      final date = DateTime.tryParse(task.timeText);
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (task.timeText.isNotEmpty) ...[
+            Tooltip(
+              message: task.timeText,
+              child: DateTimePicker(
+                value: task.timeText,
+                displayText: date == null
+                    ? task.timeText
+                    : '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}',
+                notHoverStyle: Theme.of(context).textTheme.bodySmall,
+                onChange: (value) => unawaited(onSetNextRun(task.name, value)),
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
+          dragEnabled
+              ? Draggable<ConfigDragPayload>(
+                  data: payload,
+                  feedback: DragCopyFeedback(label: payload.displayLabel),
+                  onDragStarted: () => controller.startConfigDrag(payload),
+                  onDragEnd: (_) => controller.clearConfigDrag(),
+                  child: title,
+                )
+              : title,
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -48,10 +81,9 @@ class _TaskMeta extends StatelessWidget {
           DateTimePicker(
             value: task.timeText,
             notHoverStyle: Theme.of(context).textTheme.labelMedium,
-            hoverStyle: Theme.of(context)
-                .textTheme
-                .labelMedium
-                ?.copyWith(color: Theme.of(context).colorScheme.primary),
+            hoverStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onChange: (value) => unawaited(onSetNextRun(task.name, value)),
           ),
         ],
@@ -68,12 +100,18 @@ class _TaskTypeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = switch (type) {
-      TaskStatusType.running =>
-        const Icon(Icons.bolt_rounded, color: Colors.green),
-      TaskStatusType.pending =>
-        const Icon(Icons.layers_rounded, color: Colors.orange),
-      TaskStatusType.waiting =>
-        const Icon(Icons.schedule_rounded, color: Colors.blueGrey),
+      TaskStatusType.running => const Icon(
+        Icons.bolt_rounded,
+        color: Colors.green,
+      ),
+      TaskStatusType.pending => const Icon(
+        Icons.layers_rounded,
+        color: Colors.orange,
+      ),
+      TaskStatusType.waiting => const Icon(
+        Icons.schedule_rounded,
+        color: Colors.blueGrey,
+      ),
     };
     return SizedBox(width: 28, height: 28, child: Center(child: icon));
   }

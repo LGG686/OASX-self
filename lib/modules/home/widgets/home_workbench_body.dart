@@ -11,6 +11,7 @@ class HomeWorkbenchBody extends StatefulWidget {
     required this.collectionBuilder,
     required this.detailsBuilder,
     required this.sidebar,
+    this.balancedColumns = false,
   });
 
   /// Home dashboard controller providing persisted split state.
@@ -23,10 +24,12 @@ class HomeWorkbenchBody extends StatefulWidget {
   final Widget Function(
     HomeWorkbenchLayoutMode layoutMode,
     VoidCallback? onExpandRightSidebar,
-  ) detailsBuilder;
+  )
+  detailsBuilder;
 
   /// Right sidebar widget reused in three-pane mode.
   final Widget sidebar;
+  final bool balancedColumns;
 
   @override
   State<HomeWorkbenchBody> createState() => _HomeWorkbenchBodyState();
@@ -80,21 +83,28 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
       final persistedSplitRatio = widget.controller.workbenchSplitRatio.value;
       return LayoutBuilder(
         builder: (context, constraints) {
+          final collectionWidth =
+              widget.balancedColumns &&
+                  persistedCollectionWidth ==
+                      kHomeWorkbenchDefaultCollectionWidth
+              ? (constraints.maxWidth - 2 * kHomeWorkbenchDividerWidth) / 3
+              : persistedCollectionWidth;
           final unrestrictedLayout = resolveHomeWorkbenchLayout(
             maxWidth: constraints.maxWidth,
-            collectionWidth: persistedCollectionWidth,
+            collectionWidth: collectionWidth,
             splitRatio: persistedSplitRatio,
           );
           final layout = _resolveLayout(
             maxWidth: constraints.maxWidth,
-            persistedCollectionWidth: persistedCollectionWidth,
+            persistedCollectionWidth: collectionWidth,
             persistedSplitRatio: persistedSplitRatio,
             unrestrictedLayout: unrestrictedLayout,
           );
           final layoutMode = layout.mode;
           widget.controller.setWorkbenchLayoutMode(layoutMode);
           final collection = widget.collectionBuilder(layoutMode);
-          final canExpandRightSidebar = _forceTwoPane &&
+          final canExpandRightSidebar =
+              _forceTwoPane &&
               unrestrictedLayout.mode == HomeWorkbenchLayoutMode.threePane;
           final details = _buildPaneFrame(
             child: widget.detailsBuilder(
@@ -113,7 +123,8 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
             );
           }
           return Obx(() {
-            final showWorkspace = widget.controller.workbenchPage.value ==
+            final showWorkspace =
+                widget.controller.workbenchPage.value ==
                     HomeWorkbenchPage.workspace &&
                 widget.controller.activeScriptName.value.trim().isNotEmpty;
             return showWorkspace ? details : collection;
@@ -173,8 +184,18 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
     required double persistedSplitRatio,
     required HomeWorkbenchLayout unrestrictedLayout,
   }) {
-    final currentCollectionWidth =
+    final desiredCollectionWidth =
         _dragCollectionWidth ?? persistedCollectionWidth;
+    final currentCollectionWidth = widget.balancedColumns
+        ? desiredCollectionWidth
+              .clamp(
+                300.0,
+                maxWidth -
+                    kHomeWorkbenchMinDetailsWidth -
+                    kHomeWorkbenchDividerWidth,
+              )
+              .toDouble()
+        : desiredCollectionWidth;
     final currentSplitRatio = _dragSplitRatio ?? persistedSplitRatio;
     _lastResolvedWidth = maxWidth;
     _lastResolvedCollectionWidth = currentCollectionWidth;
@@ -189,7 +210,8 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
 
   /// Schedules three-pane restoration once the layout becomes legal again.
   void _scheduleThreePaneRestoreIfNeeded(
-      HomeWorkbenchLayoutMode unrestrictedMode) {
+    HomeWorkbenchLayoutMode unrestrictedMode,
+  ) {
     if (!_forceTwoPane ||
         _isDraggingLeftDivider ||
         !_hasRestoreTriggerChanged() ||
@@ -238,7 +260,9 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
 
   /// Updates the live collection width while keeping at least a two-pane desktop.
   void _handleLeftDragUpdate(
-      DragUpdateDetails details, HomeWorkbenchLayout layout) {
+    DragUpdateDetails details,
+    HomeWorkbenchLayout layout,
+  ) {
     final currentTargetWidth =
         _dragTargetCollectionWidth ?? layout.collectionWidth;
     final nextTargetWidth = currentTargetWidth + details.delta.dx;
@@ -279,7 +303,9 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
 
   /// Updates the live split ratio while exposing a buffered collapse state.
   void _handleRightDragUpdate(
-      DragUpdateDetails details, HomeWorkbenchLayout layout) {
+    DragUpdateDetails details,
+    HomeWorkbenchLayout layout,
+  ) {
     final currentTargetWidth = _dragTargetDetailsWidth ?? layout.detailsWidth;
     final nextTargetWidth = currentTargetWidth + details.delta.dx;
     final dragState = resolveHomeWorkbenchDragState(
@@ -312,16 +338,19 @@ class _HomeWorkbenchBodyState extends State<HomeWorkbenchBody> {
           widget.controller.displayedWorkbenchSidebarTabFor(
             HomeWorkbenchLayoutMode.threePane,
           ),
-        HomeWorkbenchCollapseSide.logs => widget.controller
-            .displayedWorkbenchTabFor(HomeWorkbenchLayoutMode.threePane),
+        HomeWorkbenchCollapseSide.logs =>
+          widget.controller.displayedWorkbenchTabFor(
+            HomeWorkbenchLayoutMode.threePane,
+          ),
       };
       widget.controller.setActiveWorkbenchTabValue(preservedTab);
     }
     setState(() {
       _forceTwoPane = _collapseOnRelease;
       _forcedTwoPaneWidth = _collapseOnRelease ? _lastResolvedWidth : null;
-      _forcedTwoPaneCollectionWidth =
-          _collapseOnRelease ? _lastResolvedCollectionWidth : null;
+      _forcedTwoPaneCollectionWidth = _collapseOnRelease
+          ? _lastResolvedCollectionWidth
+          : null;
       _dragSplitRatio = null;
       _dragTargetDetailsWidth = null;
       _pendingCollapseSide = null;
@@ -395,8 +424,9 @@ class _WorkbenchDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dividerColor = Theme.of(context).colorScheme.outlineVariant;
-    final highlightColor =
-        Colors.blueAccent.withValues(alpha: 0.12 + collapseProgress * 0.22);
+    final highlightColor = Colors.blueAccent.withValues(
+      alpha: 0.12 + collapseProgress * 0.22,
+    );
     return MouseRegion(
       cursor: SystemMouseCursors.resizeColumn,
       child: GestureDetector(
@@ -420,8 +450,8 @@ class _WorkbenchDivider extends StatelessWidget {
                       borderRadius: BorderRadius.horizontal(
                         left:
                             collapseSide == HomeWorkbenchCollapseSide.workbench
-                                ? const Radius.circular(999)
-                                : Radius.zero,
+                            ? const Radius.circular(999)
+                            : Radius.zero,
                         right: collapseSide == HomeWorkbenchCollapseSide.logs
                             ? const Radius.circular(999)
                             : Radius.zero,
@@ -433,8 +463,9 @@ class _WorkbenchDivider extends StatelessWidget {
                 child: Container(
                   width: 2,
                   decoration: BoxDecoration(
-                    color:
-                        collapseSide == null ? dividerColor : Colors.blueAccent,
+                    color: collapseSide == null
+                        ? dividerColor
+                        : Colors.blueAccent,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),

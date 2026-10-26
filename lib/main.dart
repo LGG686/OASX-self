@@ -16,6 +16,8 @@ import 'package:oasx/service/theme_service.dart';
 import 'package:oasx/service/websocket_service.dart';
 import 'package:oasx/service/window_service.dart';
 import 'package:oasx/service/illustration_service.dart';
+import 'package:oasx/service/standalone_profile_stub.dart'
+    if (dart.library.io) 'package:oasx/service/standalone_profile_io.dart';
 import 'package:oasx/modules/common/widgets/illustration_backdrop.dart';
 import 'package:oasx/translation/i18n.dart';
 import 'package:oasx/utils/logger.dart';
@@ -74,6 +76,7 @@ class GlobalBehavior extends MaterialScrollBehavior {
 }
 
 Future<void> initService() async {
+  await initializeStandaloneProfile();
   await GetStorage.init();
 
   Get.put(SettingsController(), permanent: true);

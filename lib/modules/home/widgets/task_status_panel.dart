@@ -16,6 +16,8 @@ class TaskStatusPanel extends StatefulWidget {
     required this.onQuickRun,
     required this.onQuickWait,
     required this.onEditTask,
+    this.scheduledDate,
+    this.compact = false,
   });
 
   final HomeDashboardController controller;
@@ -25,6 +27,8 @@ class TaskStatusPanel extends StatefulWidget {
   final Future<void> Function(String taskName) onQuickRun;
   final Future<void> Function(String taskName) onQuickWait;
   final Future<void> Function(String taskName) onEditTask;
+  final DateTime? scheduledDate;
+  final bool compact;
 
   @override
   State<TaskStatusPanel> createState() => _TaskStatusPanelState();
@@ -63,6 +67,15 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
       final visibleTasks = rawTasks
           .where((task) => !_hiddenTaskIds.contains(task.rowId))
           .where(_matchesTaskQuery)
+          .where((task) {
+            final date = widget.scheduledDate;
+            if (date == null) return true;
+            final next = DateTime.tryParse(task.timeText);
+            final day = next ?? DateTime.now();
+            return day.year == date.year &&
+                day.month == date.month &&
+                day.day == date.day;
+          })
           .toList();
       return Column(
         children: [
@@ -76,7 +89,8 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
                     controller: _scrollController,
                     padding: EdgeInsets.zero,
                     itemCount: visibleTasks.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) =>
+                        SizedBox(height: widget.compact ? 4 : 10),
                     itemBuilder: (context, index) {
                       final task = visibleTasks[index];
                       return TaskStatusRow(
@@ -97,6 +111,7 @@ class _TaskStatusPanelState extends State<TaskStatusPanel> {
                         dragEnabled: widget.controller.canUseDesktopDragCopy,
                         swipeEnabled: !_isSwipeDisabled(task),
                         activeDragPayload: dragPayload,
+                        compact: widget.compact,
                       );
                     },
                   ),

@@ -222,15 +222,15 @@ UI 文案应优先通过 `I18n` key + `.tr` 接入，不建议直接写死展示
 - `script/extract_changelog.py`：提取最新变更日志
 - `script/release_windows.py`：执行 Windows 构建
 - `script/release_windows_package.py`：打包 Windows 发布产物
-- `.github/workflows/release.yml`：基于 tag 的 Windows / Android / Web 发布工作流
+- `.github/workflows/release.yml`：基于 tag 的 Windows / Android 发布工作流
 
 发布工作流的关键行为包括：
 
 - 解析 tag 生成构建版本
-- 提取最新变更日志并创建 GitHub Release
+- 提取最新变更日志并创建 GitHub Release 草稿
 - 构建 Windows 压缩包
-- 构建 Android 通用包与分 ABI APK
-- 构建 Web 并发布到 GitHub Pages 分支
+- 按 AzurTian/OASX 的规格构建 Android `arm64-v8a`、`armeabi-v7a` 分 ABI APK
+- Windows ZIP 与两个 Android APK 全部构建并上传成功后，正式公开 Release
 
 ## 与 OAS 的关系
 

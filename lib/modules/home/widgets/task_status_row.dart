@@ -48,6 +48,7 @@ class TaskStatusRow extends StatelessWidget {
     required this.dragEnabled,
     required this.swipeEnabled,
     required this.activeDragPayload,
+    this.compact = false,
   });
 
   final HomeDashboardController controller;
@@ -64,6 +65,7 @@ class TaskStatusRow extends StatelessWidget {
   final bool dragEnabled;
   final bool swipeEnabled;
   final ConfigDragPayload? activeDragPayload;
+  final bool compact;
   static const double _actionExtent = 132;
 
   @override
@@ -80,9 +82,9 @@ class TaskStatusRow extends StatelessWidget {
           border: Border.all(color: _borderColor(context)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(compact ? 5 : 10),
           child: SplitScrollRow(
-            minHeight: 40,
+            minHeight: compact ? 36 : 40,
             trailingExtent: _actionExtent,
             trailingBackgroundColor: rowBackground,
             trailing: _TaskActionBar(
@@ -105,6 +107,7 @@ class TaskStatusRow extends StatelessWidget {
                   task: task,
                   onSetNextRun: onSetNextRun,
                   dragEnabled: dragEnabled,
+                  compact: compact,
                 ),
               ],
             ),

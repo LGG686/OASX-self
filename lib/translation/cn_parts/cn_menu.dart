@@ -50,6 +50,7 @@ final Map<String, String> _cn_menu = {
   I18n.weeklyTrifles: '每周琐事',
   I18n.mysteryShop: '神秘商店',
   I18n.duel: '斗技',
+  'Chess': '百鬼棋局',
   I18n.activityShikigami: '当期爬塔',
   I18n.metaDemon: '超鬼王',
   I18n.memoryScrolls: '绘卷',

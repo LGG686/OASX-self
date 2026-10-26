@@ -14,6 +14,7 @@ class WorkbenchSidebarPanel extends StatelessWidget {
     super.key,
     required this.controller,
     required this.scriptName,
+    this.alignedHeaderHeight,
   });
 
   /// Dashboard controller that owns sidebar tab state.
@@ -21,9 +22,63 @@ class WorkbenchSidebarPanel extends StatelessWidget {
 
   /// Active script rendered by the sidebar.
   final String scriptName;
+  final double? alignedHeaderHeight;
 
   @override
   Widget build(BuildContext context) {
+    if (alignedHeaderHeight != null) {
+      return Obx(() {
+        final tabs = controller.workbenchSidebarTabsFor(
+          HomeWorkbenchLayoutMode.threePane,
+        );
+        final currentTab = controller.displayedWorkbenchSidebarTabFor(
+          HomeWorkbenchLayoutMode.threePane,
+        );
+        final header = Wrap(
+          spacing: 6,
+          runSpacing: 4,
+          children: tabs
+              .map(
+                (tab) => ChoiceChip(
+                  label: Text(_tabLabel(tab)),
+                  showCheckmark: false,
+                  selected: currentTab == tab,
+                  onSelected: (_) =>
+                      controller.setActiveWorkbenchSidebarTabValue(tab),
+                ),
+              )
+              .toList(),
+        );
+        if (currentTab == HomeWorkbenchTab.logs && scriptName.isNotEmpty) {
+          return LogCenterPanel(
+            scriptName: scriptName,
+            header: header,
+            headerExtent: alignedHeaderHeight,
+          );
+        }
+        return Column(
+          children: [
+            SizedBox(
+              height: alignedHeaderHeight,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Align(alignment: Alignment.topLeft, child: header),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: Card(
+                child: currentTab == HomeWorkbenchTab.stats
+                    ? const ScriptStatisticsPanel()
+                    : ScriptAnalysisPanel(scriptName: scriptName),
+              ),
+            ),
+          ],
+        );
+      });
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -56,10 +111,12 @@ class WorkbenchSidebarPanel extends StatelessWidget {
               Expanded(
                 child: switch (currentTab) {
                   HomeWorkbenchTab.stats => const ScriptStatisticsPanel(),
-                  HomeWorkbenchTab.logs =>
-                    LogCenterPanel(scriptName: scriptName),
-                  HomeWorkbenchTab.analysis =>
-                    ScriptAnalysisPanel(scriptName: scriptName),
+                  HomeWorkbenchTab.logs => LogCenterPanel(
+                    scriptName: scriptName,
+                  ),
+                  HomeWorkbenchTab.analysis => ScriptAnalysisPanel(
+                    scriptName: scriptName,
+                  ),
                   _ => const SizedBox.shrink(),
                 },
               ),
