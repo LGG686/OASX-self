@@ -8,10 +8,12 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
     super.key,
     required this.script,
     this.showWaitingTime = true,
+    this.compact = false,
   });
 
   final ScriptModel script;
   final bool showWaitingTime;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +25,14 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           softWrap: false,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: compact
+              ? Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 11)
+              : Theme.of(context).textTheme.bodyMedium,
         );
       }
       return Row(
         children: [
-          Icon(
-            preview.icon,
-            size: 14,
-            color: preview.color,
-          ),
+          Icon(preview.icon, size: compact ? 12 : 14, color: preview.color),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
@@ -40,7 +40,11 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               softWrap: false,
-              style: Theme.of(context).textTheme.labelMedium,
+              style: compact
+                  ? Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(fontSize: 11)
+                  : Theme.of(context).textTheme.labelMedium,
             ),
           ),
         ],
@@ -62,10 +66,7 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
       if (taskName.isEmpty) {
         continue;
       }
-      return _TaskPreviewData(
-        type: _PreviewTaskType.pending,
-        name: taskName,
-      );
+      return _TaskPreviewData(type: _PreviewTaskType.pending, name: taskName);
     }
     for (final task in model.waitingTaskList) {
       final taskName = task.taskName.value.trim();
@@ -82,11 +83,7 @@ class ConfigCollectionTaskPreview extends StatelessWidget {
   }
 }
 
-enum _PreviewTaskType {
-  running,
-  pending,
-  waiting,
-}
+enum _PreviewTaskType { running, pending, waiting }
 
 class _TaskPreviewData {
   const _TaskPreviewData({

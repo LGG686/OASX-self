@@ -182,7 +182,7 @@ void main() {
   );
 
   testWidgets(
-    'aligned desktop, centered distribution and horizontal overflow at 1600 and 1200',
+    'content-sized headers, centered distribution and horizontal overflow at 1600 and 1200',
     (tester) async {
       final controller = setup();
       final boundary = GlobalKey();
@@ -221,6 +221,63 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
       expect(tester.takeException(), isNull);
       final strip = find.byKey(const ValueKey('desktop-script-strip'));
+      final stripTask = find.byKey(const ValueKey('script-strip-task-CDB'));
+      expect(
+        find.descendant(
+          of: stripTask,
+          matching: find.textContaining('09:00:00'),
+        ),
+        findsOneWidget,
+      );
+      final script = Get.find<ScriptService>().scriptModelMap['CDB']!;
+      script.runningTask.value = TaskItemModel('CDB', 'Chess', '');
+      await tester.pump();
+      expect(
+        find.descendant(of: stripTask, matching: find.text('百鬼棋局')),
+        findsOneWidget,
+      );
+      script.runningTask.value = TaskItemModel('CDB', '', '');
+      await tester.pump();
+      expect(
+        find.descendant(
+          of: stripTask,
+          matching: find.textContaining('09:00:00'),
+        ),
+        findsOneWidget,
+      );
+      expect(tester.getSize(strip).height, lessThanOrEqualTo(66));
+      final scrollbarTheme = tester
+          .widget<ScrollbarTheme>(
+            find
+                .ancestor(of: strip, matching: find.byType(ScrollbarTheme))
+                .first,
+          )
+          .data;
+      expect(scrollbarTheme.thumbColor!.resolve({})!.a, closeTo(.10, .005));
+      expect(
+        scrollbarTheme.thumbColor!.resolve({WidgetState.dragged})!.a,
+        greaterThan(.5),
+      );
+      expect(
+        (tester.widget<ListView>(strip).padding! as EdgeInsets).bottom,
+        16,
+      );
+      controller.toggleLinkMode();
+      await tester.pump();
+      final linkCheckbox = find
+          .descendant(of: strip, matching: find.byType(Checkbox))
+          .first;
+      expect(tester.widget<Checkbox>(linkCheckbox).value, isFalse);
+      await tester.tap(linkCheckbox);
+      await tester.pump();
+      expect(controller.isScriptLinked('CDB'), isTrue);
+      expect(tester.widget<Checkbox>(linkCheckbox).value, isTrue);
+      await tester.tap(linkCheckbox);
+      await tester.pump();
+      expect(controller.isScriptLinked('CDB'), isFalse);
+      expect(tester.widget<Checkbox>(linkCheckbox).value, isFalse);
+      controller.toggleLinkMode();
+      await tester.pump();
       final scroll = tester.widget<ListView>(strip).controller!;
       final before = scroll.offset;
       await tester.tap(find.byTooltip('向右滚动'));
@@ -229,6 +286,18 @@ void main() {
       expect(scroll.offset, greaterThan(before));
       final distribution = find.byType(TaskDateDistribution);
       final panel = tester.getRect(distribution);
+      controller.activeWorkbenchSidebarTab.value = HomeWorkbenchTab.logs;
+      await tester.pump(const Duration(milliseconds: 400));
+      final logControls = tester.getRect(
+        find.byKey(const ValueKey('desktop-log-controls')),
+      );
+      expect(logControls.height, lessThan(140));
+      final dateCard = tester.getRect(
+        find.ancestor(of: distribution, matching: find.byType(Card)).first,
+      );
+      expect(logControls.bottom, lessThan(dateCard.bottom));
+      controller.activeWorkbenchSidebarTab.value = HomeWorkbenchTab.stats;
+      await tester.pump(const Duration(milliseconds: 400));
       final bodyCenter = tester.getCenter(
         find.byKey(const ValueKey('task-date-distribution-center')),
       );

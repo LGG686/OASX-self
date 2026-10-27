@@ -151,11 +151,10 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
       child: Builder(
         builder: (context) => LayoutBuilder(
           builder: (context, constraints) {
-            final headerHeight = constraints.maxHeight < 700 ? 174.0 : 196.0;
             return Column(
               children: [
                 SizedBox(
-                  height: 60,
+                  height: 66,
                   child: DesktopScriptStrip(
                     controller: widget.controller,
                     onActivate: (name) async {
@@ -180,10 +179,7 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                       if (script == null) return _empty();
                       return Column(
                         children: [
-                          SizedBox(
-                            height: headerHeight,
-                            child: _summary(script),
-                          ),
+                          _summary(script),
                           const SizedBox(height: 12),
                           Expanded(
                             child: mode == HomeWorkbenchLayoutMode.threePane
@@ -203,7 +199,7 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                       return Column(
                         children: [
                           SizedBox(
-                            height: headerHeight,
+                            height: 140,
                             child: _dateCard(script, expand),
                           ),
                           const SizedBox(height: 12),
@@ -219,7 +215,7 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                       () => WorkbenchSidebarPanel(
                         controller: widget.controller,
                         scriptName: widget.controller.activeScriptName.value,
-                        alignedHeaderHeight: headerHeight,
+                        separateHeader: true,
                       ),
                     ),
                   ),
@@ -411,7 +407,7 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
             runSpacing: 4,
             children: [
               ChoiceChip(
-              label: const Text('任务'),
+                label: const Text('任务'),
                 showCheckmark: false,
                 selected:
                     currentTab == HomeWorkbenchTab.status && !_showCatalog,
@@ -419,7 +415,7 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
               ),
               if (!sideBySide)
                 ChoiceChip(
-                label: const Text('总览'),
+                  label: const Text('总览'),
                   showCheckmark: false,
                   selected:
                       currentTab == HomeWorkbenchTab.status && _showCatalog,
@@ -512,14 +508,13 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                     size: 18,
                   ),
                 ),
-                FilledButton(
-                  onPressed: () => widget.onTogglePower(script.name, !running),
-                  style: running
-                      ? FilledButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.error,
-                        )
-                      : null,
-                  child: Text(running ? '停止运行' : '启动运行'),
+                IconButton(
+                  tooltip: (running ? I18n.stop : I18n.run).tr,
+                  iconSize: 18,
+                  onPressed: widget.controller.isDragCopyPendingFor(script.name)
+                      ? null
+                      : () => widget.onTogglePower(script.name, !running),
+                  icon: const Icon(Icons.power_settings_new_rounded),
                 ),
               ],
             ),
@@ -558,7 +553,6 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                 ),
               ],
             ),
-            const Spacer(),
             const Divider(height: 12),
             DesktopSummaryMetrics(
               key: ValueKey(script.name),
@@ -813,113 +807,143 @@ class _DesktopScriptStripState extends State<DesktopScriptStrip> {
           icon: const Icon(Icons.chevron_left),
         ),
         Expanded(
-          child: Scrollbar(
-            controller: _scroll,
-            thumbVisibility: true,
-            scrollbarOrientation: ScrollbarOrientation.bottom,
-            child: ListView.separated(
-              key: const ValueKey('desktop-script-strip'),
+          child: ScrollbarTheme(
+            data: ScrollbarTheme.of(context).copyWith(
+              thickness: const WidgetStatePropertyAll(6),
+              thumbColor: WidgetStateProperty.resolveWith(
+                (states) => colors.onSurface.withValues(
+                  alpha: states.contains(WidgetState.dragged) ? .55 : .10,
+                ),
+              ),
+            ),
+            child: Scrollbar(
               controller: _scroll,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(bottom: 10, top: 4),
-              itemCount: scripts.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final script = scripts[index];
-                return Obx(() {
-                  final active =
-                      widget.controller.activeScriptName.value == script.name;
-                  final running = script.state.value == ScriptState.running;
-                  final linking = widget.controller.isLinkModeEnabled.value;
-                  return DragTarget<ConfigDragPayload>(
-                    onWillAcceptWithDetails: (details) =>
-                        details.data.canDropOn(script.name) &&
-                        !widget.controller.isDragCopyPendingFor(script.name),
-                    onMove: (details) {
-                      final box = context.findRenderObject();
-                      if (box is RenderBox) {
-                        final x = box.globalToLocal(details.offset).dx;
-                        if (x < 32) _move(-60);
-                        if (x > box.size.width - 32) _move(60);
-                      }
-                    },
-                    onAcceptWithDetails: (details) async {
-                      widget.controller.clearConfigDrag();
-                      await widget.controller.acceptConfigDrag(
-                        payload: details.data,
-                        destinationConfig: script.name,
-                      );
-                    },
-                    builder: (context, candidates, _) => Material(
-                      color: active || candidates.isNotEmpty
-                          ? colors.primaryContainer
-                          : colors.surfaceContainerLow,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                          color: active
-                              ? colors.primary.withValues(alpha: .4)
-                              : colors.outlineVariant,
+              thumbVisibility: true,
+              scrollbarOrientation: ScrollbarOrientation.bottom,
+              child: ListView.separated(
+                key: const ValueKey('desktop-script-strip'),
+                controller: _scroll,
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(bottom: 16, top: 4),
+                itemCount: scripts.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final script = scripts[index];
+                  return Obx(() {
+                    final active =
+                        widget.controller.activeScriptName.value == script.name;
+                    final running = script.state.value == ScriptState.running;
+                    final linking = widget.controller.isLinkModeEnabled.value;
+                    // Read selection inside Obx, before DragTarget's deferred builder.
+                    final linked = widget.controller.isScriptLinked(
+                      script.name,
+                    );
+                    return DragTarget<ConfigDragPayload>(
+                      onWillAcceptWithDetails: (details) =>
+                          details.data.canDropOn(script.name) &&
+                          !widget.controller.isDragCopyPendingFor(script.name),
+                      onMove: (details) {
+                        final box = context.findRenderObject();
+                        if (box is RenderBox) {
+                          final x = box.globalToLocal(details.offset).dx;
+                          if (x < 32) _move(-60);
+                          if (x > box.size.width - 32) _move(60);
+                        }
+                      },
+                      onAcceptWithDetails: (details) async {
+                        widget.controller.clearConfigDrag();
+                        await widget.controller.acceptConfigDrag(
+                          payload: details.data,
+                          destinationConfig: script.name,
+                        );
+                      },
+                      builder: (context, candidates, _) => Material(
+                        color: active || candidates.isNotEmpty
+                            ? colors.primaryContainer
+                            : colors.surfaceContainerLow,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            color: active
+                                ? colors.primary.withValues(alpha: .4)
+                                : colors.outlineVariant,
+                          ),
                         ),
-                      ),
-                      child: InkWell(
-                        onTap: () => widget.onActivate(script.name),
-                        borderRadius: BorderRadius.circular(10),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 2),
-                          child: Row(
-                            children: [
-                              if (linking)
-                                Checkbox(
-                                  value: widget.controller.isScriptLinked(
-                                    script.name,
+                        child: InkWell(
+                          onTap: () => widget.onActivate(script.name),
+                          borderRadius: BorderRadius.circular(10),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10, right: 2),
+                            child: Row(
+                              children: [
+                                if (linking)
+                                  Checkbox(
+                                    value: linked,
+                                    visualDensity: VisualDensity.compact,
+                                    onChanged: (value) =>
+                                        widget.controller.setScriptLinked(
+                                          script.name,
+                                          value ?? false,
+                                        ),
                                   ),
-                                  visualDensity: VisualDensity.compact,
-                                  onChanged: (value) =>
-                                      widget.controller.setScriptLinked(
+                                ConfigStateIndicator(
+                                  state: widget.controller.scriptStateFor(
+                                    script,
+                                  ),
+                                  size: 10,
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 132,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
                                         script.name,
-                                        value ?? false,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.labelMedium,
                                       ),
+                                      const SizedBox(height: 2),
+                                      ConfigCollectionTaskPreview(
+                                        key: ValueKey(
+                                          'script-strip-task-${script.name}',
+                                        ),
+                                        script: script,
+                                        compact: true,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ConfigStateIndicator(
-                                state: widget.controller.scriptStateFor(script),
-                                size: 10,
-                              ),
-                              const SizedBox(width: 8),
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 150,
-                                ),
-                                child: Text(
-                                  script.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              IconButton(
-                                tooltip: (running ? I18n.stop : I18n.run).tr,
-                                iconSize: 18,
-                                onPressed:
-                                    widget.controller.isDragCopyPendingFor(
-                                      script.name,
-                                    )
-                                    ? null
-                                    : () => widget.onTogglePower(
+                                IconButton(
+                                  tooltip: (running ? I18n.stop : I18n.run).tr,
+                                  iconSize: 18,
+                                  onPressed:
+                                      widget.controller.isDragCopyPendingFor(
                                         script.name,
-                                        !running,
-                                      ),
-                                icon: const Icon(
-                                  Icons.power_settings_new_rounded,
+                                      )
+                                      ? null
+                                      : () => widget.onTogglePower(
+                                          script.name,
+                                          !running,
+                                        ),
+                                  icon: const Icon(
+                                    Icons.power_settings_new_rounded,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                });
-              },
+                    );
+                  });
+                },
+              ),
             ),
           ),
         ),

@@ -100,26 +100,25 @@ class _LogCenterPanelState extends State<LogCenterPanel> {
     if (controller == null) {
       return Card(child: Center(child: Text(I18n.homeNoLog.tr)));
     }
-    if (widget.headerExtent != null) {
+    if (widget.header != null || widget.headerExtent != null) {
       return Column(
         children: [
           SizedBox(
             height: widget.headerExtent,
             child: Card(
+              key: const ValueKey('desktop-log-controls'),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (widget.header != null) widget.header!,
-                    Expanded(
-                      child: Center(
-                        child: LogCenterToolbar(
-                          controller: controller,
-                          onToggleLineWrap: () =>
-                              _handleLogCenterLineWrapToggle(this),
-                        ),
-                      ),
+                    const SizedBox(height: 8),
+                    LogCenterToolbar(
+                      controller: controller,
+                      onToggleLineWrap: () =>
+                          _handleLogCenterLineWrapToggle(this),
                     ),
                   ],
                 ),

@@ -14,7 +14,7 @@ class WorkbenchSidebarPanel extends StatelessWidget {
     super.key,
     required this.controller,
     required this.scriptName,
-    this.alignedHeaderHeight,
+    this.separateHeader = false,
   });
 
   /// Dashboard controller that owns sidebar tab state.
@@ -22,11 +22,11 @@ class WorkbenchSidebarPanel extends StatelessWidget {
 
   /// Active script rendered by the sidebar.
   final String scriptName;
-  final double? alignedHeaderHeight;
+  final bool separateHeader;
 
   @override
   Widget build(BuildContext context) {
-    if (alignedHeaderHeight != null) {
+    if (separateHeader) {
       return Obx(() {
         final tabs = controller.workbenchSidebarTabsFor(
           HomeWorkbenchLayoutMode.threePane,
@@ -50,21 +50,14 @@ class WorkbenchSidebarPanel extends StatelessWidget {
               .toList(),
         );
         if (currentTab == HomeWorkbenchTab.logs && scriptName.isNotEmpty) {
-          return LogCenterPanel(
-            scriptName: scriptName,
-            header: header,
-            headerExtent: alignedHeaderHeight,
-          );
+          return LogCenterPanel(scriptName: scriptName, header: header);
         }
         return Column(
           children: [
-            SizedBox(
-              height: alignedHeaderHeight,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Align(alignment: Alignment.topLeft, child: header),
-                ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Align(alignment: Alignment.topLeft, child: header),
               ),
             ),
             const SizedBox(height: 12),
