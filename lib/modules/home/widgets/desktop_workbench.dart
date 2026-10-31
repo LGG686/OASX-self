@@ -194,6 +194,14 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                     }),
                     detailsBuilder: (mode, expand) => Obx(() {
                       final script = widget.controller.activeScriptModel;
+                      // Must be read here so the Obx subscribes to it. The
+                      // compact layout decides between the task list and the
+                      // parameter panel inside a LayoutBuilder callback, which
+                      // runs after the build phase and is therefore not
+                      // tracked; without this read, opening a task updates the
+                      // state but never rebuilds the pane.
+                      final activeTask =
+                          widget.controller.activeTaskName.value;
                       if (script == null) return _empty();
                       final full = mode == HomeWorkbenchLayoutMode.threePane;
                       return Column(
@@ -205,8 +213,8 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
                           const SizedBox(height: 12),
                           Expanded(
                             child: full
-                                ? _taskArea(context, script)
-                                : _compactRight(context, script),
+                                ? _taskArea(context, script, activeTask)
+                                : _compactRight(context, script, activeTask),
                           ),
                         ],
                       );
@@ -303,8 +311,12 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
     ),
   );
 
-  Widget _taskArea(BuildContext context, ScriptModel script) {
-    if (widget.controller.activeTaskName.value.isNotEmpty) {
+  Widget _taskArea(
+    BuildContext context,
+    ScriptModel script,
+    String activeTask,
+  ) {
+    if (activeTask.isNotEmpty) {
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -390,6 +402,7 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
   Widget _compactRight(
     BuildContext context,
     ScriptModel script,
+    String activeTask,
   ) => LayoutBuilder(
     builder: (context, constraints) {
       final sideBySide = constraints.maxWidth >= 700;
@@ -441,8 +454,8 @@ class _DesktopWorkbenchState extends State<DesktopWorkbench> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: widget.controller.activeTaskName.value.isNotEmpty
-                ? _taskArea(context, script)
+            child: activeTask.isNotEmpty
+                ? _taskArea(context, script, activeTask)
                 : switch (currentTab) {
                     HomeWorkbenchTab.stats => const Card(
                       child: ScriptStatisticsPanel(),
