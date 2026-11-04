@@ -7,7 +7,7 @@ const _activityBattles = <String, String>{
   'pass': '门票简单',
   'pass_hard': '门票困难',
   'ap100': '百体',
-  'boss': '首领boss',
+  'boss': '首领',
   'fakegod': '伪神',
 };
 

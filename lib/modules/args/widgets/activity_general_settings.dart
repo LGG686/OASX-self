@@ -63,36 +63,38 @@ class _ActivityGeneralSettingsState extends State<ActivityGeneralSettings> {
 
   Widget passInput(int index, String label) {
     final values = (field('pass_limit')?.value.toString() ?? '0').split(',');
-    return Row(
-      children: [
-        Text('$label：'),
-        const SizedBox(width: 6),
-        Expanded(
-          child: TextFormField(
-            key: ValueKey('pass-$index-${widget.script}'),
-            initialValue: index < values.length ? values[index] : '0',
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: InputDecoration(
-              isDense: true,
-              errorText: Get.find<ArgsController>().fieldError(
-                widget.group.groupName,
-                'pass_limit',
+    return LayoutBuilder(
+      builder: (context, constraints) => Row(
+        children: [
+          Expanded(child: Text('$label：')),
+          const SizedBox(width: 6),
+          SizedBox(
+            width: constraints.maxWidth * .5,
+            child: TextFormField(
+              key: ValueKey('pass-$index-${widget.script}'),
+              initialValue: index < values.length ? values[index] : '0',
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                isDense: true,
+                errorText: Get.find<ArgsController>().fieldError(
+                  widget.group.groupName,
+                  'pass_limit',
+                ),
               ),
+              onChanged: (value) {
+                final next = (field('pass_limit')?.value.toString() ?? '0')
+                    .split(',');
+                while (next.length < 2) {
+                  next.add('0');
+                }
+                next[index] = value.isEmpty ? '0' : value;
+                save('pass_limit', next.join(','));
+              },
             ),
-            onChanged: (value) {
-              final next = (field('pass_limit')?.value.toString() ?? '0').split(
-                ',',
-              );
-              while (next.length < 2) {
-                next.add('0');
-              }
-              next[index] = value.isEmpty ? '0' : value;
-              save('pass_limit', next.join(','));
-            },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -110,24 +112,14 @@ class _ActivityGeneralSettingsState extends State<ActivityGeneralSettings> {
 
   Widget mode(String title, Widget content) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
-    child: IntrinsicHeight(
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              alignment: Alignment.center,
-              constraints: const BoxConstraints(minHeight: 48),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              ),
-              child: Text(title),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(flex: 2, child: content),
-        ],
-      ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Align(alignment: Alignment.centerLeft, child: Text(title)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(flex: 2, child: content),
+      ],
     ),
   );
 
@@ -148,19 +140,22 @@ class _ActivityGeneralSettingsState extends State<ActivityGeneralSettings> {
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          ActivitySequenceBoard(
-            title: '任务启用项',
-            options: const ['探索', '大富翁', '伪神', '爬塔', '首领boss'],
+          ActivitySelectionDropdown(
+            title: '活动启用',
+            options: const ['探索', '大富翁', '伪神', '爬塔', '首领'],
             value: ArgumentModel.normalizeMultiEnumValue(
               field('task_sequence')?.value,
             ),
+            exclusiveGroups: const [
+              ['探索', '大富翁', '伪神'],
+            ],
             onChanged: (value) => save('task_sequence', value),
           ),
           const SizedBox(height: 16),
           if (field('climb_task_sequence') != null)
-            ActivitySequenceBoard(
-              title: '爬塔启用项',
-              options: const ['体力', '简单', '困难', '百体'],
+            ActivitySelectionDropdown(
+              title: '爬塔启用',
+              options: const ['困难', '简单', '体力', '百体'],
               value: ArgumentModel.normalizeMultiEnumValue(
                 field('climb_task_sequence')?.value,
               ),
@@ -181,7 +176,7 @@ class _ActivityGeneralSettingsState extends State<ActivityGeneralSettings> {
             ),
           ),
           mode('伪神', input('fakegod_limit', label: '行动次数')),
-          mode('首领boss', input('boss_limit', label: '挑战次数')),
+          mode('首领', input('boss_limit', label: '挑战次数')),
           const Divider(),
           for (var i = 0; i < remaining.length; i += 2)
             pair(
@@ -196,169 +191,34 @@ class _ActivityGeneralSettingsState extends State<ActivityGeneralSettings> {
   }
 }
 
-class ActivitySequenceBoard extends StatefulWidget {
-  const ActivitySequenceBoard({
+class ActivitySelectionDropdown extends StatelessWidget {
+  const ActivitySelectionDropdown({
     super.key,
     required this.title,
     required this.options,
     required this.value,
     required this.onChanged,
+    this.exclusiveGroups = const [],
   });
   final String title;
   final List<String> options;
   final List<String> value;
   final ValueChanged<List<String>> onChanged;
-  @override
-  State<ActivitySequenceBoard> createState() => _ActivitySequenceBoardState();
-}
-
-class _ActivitySequenceBoardState extends State<ActivitySequenceBoard> {
-  final GlobalKey _listKey = GlobalKey();
-  Offset? _dragPosition;
-  List<String> get selected => widget.value;
-  Widget tile(String name, {bool placeholder = false}) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      height: 34,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: placeholder
-            ? colors.surfaceContainerHighest.withValues(alpha: .3)
-            : colors.secondaryContainer,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colors.outlineVariant),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (!placeholder)
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Icon(Icons.drag_indicator, size: 16),
-            ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: Text(name, overflow: TextOverflow.ellipsis),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget draggable(
-    String name, {
-    required bool active,
-  }) => LongPressDraggable<String>(
-    key: ValueKey('${widget.title}-$name-$active'),
-    data: name,
-    feedback: DragCopyFeedback(label: name),
-    childWhenDragging: Opacity(opacity: .25, child: tile(name)),
-    onDragStarted: () => _dragPosition = null,
-    onDragUpdate: (details) => _dragPosition = details.globalPosition,
-    onDragEnd: (details) {
-      if (!active || details.wasAccepted) return;
-      final box = _listKey.currentContext?.findRenderObject() as RenderBox?;
-      if (box == null) return;
-      // The pointer, rather than the feedback's top left, defines a drop outside.
-      final bounds = box.localToGlobal(Offset.zero) & box.size;
-      if (!bounds.contains(_dragPosition ?? details.offset)) {
-        widget.onChanged(selected.where((item) => item != name).toList());
-      }
-    },
-    child: tile(name),
-  );
-
-  Widget dropSlot(int index, Widget child) => DragTarget<String>(
-    onWillAcceptWithDetails: (details) => widget.options.contains(details.data),
-    onAcceptWithDetails: (details) {
-      final next = [...selected];
-      next.remove(details.data);
-      final target = index.clamp(0, next.length);
-      next.insert(target, details.data);
-      widget.onChanged(next);
-    },
-    builder: (context, candidates, rejected) => Container(
-      key: ValueKey(index < selected.length ? selected[index] : 'empty'),
-      color: candidates.isEmpty
-          ? Colors.transparent
-          : Theme.of(context).colorScheme.primary.withValues(alpha: .12),
-      child: child,
-    ),
-  );
+  final List<List<String>> exclusiveGroups;
 
   @override
-  Widget build(BuildContext context) {
-    final enabled = selected;
-    return SizedBox(
-      height: 20 + widget.options.length * 38.0,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.title),
-                const SizedBox(height: 8),
-                for (var row = 0; row < (widget.options.length + 1) ~/ 2; row++)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Row(
-                      children: [
-                        for (var col = 0; col < 2; col++) ...[
-                          if (col > 0) const SizedBox(width: 6),
-                          Expanded(
-                            child: row * 2 + col >= widget.options.length
-                                ? const SizedBox.shrink()
-                                : enabled.contains(
-                                    widget.options[row * 2 + col],
-                                  )
-                                ? tile(
-                                    widget.options[row * 2 + col],
-                                    placeholder: true,
-                                  )
-                                : draggable(
-                                    widget.options[row * 2 + col],
-                                    active: false,
-                                  ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Container(
-              key: _listKey,
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant,
-                ),
-              ),
-              child: Column(
-                children: [
-                  for (var i = 0; i < enabled.length; i++)
-                    dropSlot(
-                      i,
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: draggable(enabled[i], active: true),
-                      ),
-                    ),
-                  Expanded(
-                    child: dropSlot(enabled.length, const SizedBox.expand()),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(child: Text(title)),
+      Expanded(
+        flex: 2,
+        child: MultiEnumDropdown(
+          value: value,
+          options: options,
+          exclusiveGroups: exclusiveGroups,
+          onChanged: onChanged,
+        ),
       ),
-    );
-  }
+    ],
+  );
 }

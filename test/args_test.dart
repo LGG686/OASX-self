@@ -19,16 +19,18 @@ void main() {
       '"type":"multi_enum","enumEnum":["a","b","c"]}]}',
     );
 
-    final model = controller.groups.value.first.members.first as ArgumentModel;
+    final model = ArgumentModel.fromJson(
+      controller.groups.value.first.members.first as Map<String, dynamic>,
+    );
     expect(model.value, <String>['a', 'c']);
     expect(controller.validateArgument(model, model.value), isNull);
     expect(controller.validateArgument(model, <String>['unknown']), isNotNull);
   });
 
   test('multi_enum also accepts a JSON encoded stored value', () {
-    expect(
-      ArgumentModel.normalizeMultiEnumValue('["one","two"]'),
-      <String>['one', 'two'],
-    );
+    expect(ArgumentModel.normalizeMultiEnumValue('["one","two"]'), <String>[
+      'one',
+      'two',
+    ]);
   });
 }

@@ -73,12 +73,22 @@ class _ArgumentViewState extends State<ArgumentView> {
       if (widget.compact) {
         return Tooltip(
           message: model.description?.tr ?? '',
-          child: Row(
-            children: [
-              Flexible(child: Text('${widget.label ?? model.title.tr}：')),
-              const SizedBox(width: 6),
-              Expanded(child: form),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                Expanded(child: Text('${widget.label ?? model.title.tr}：')),
+                const SizedBox(width: 6),
+                SizedBox(
+                  width: constraints.maxWidth * .5,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: model.type == 'boolean'
+                        ? SizedBox(width: 28, child: form)
+                        : form,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }
@@ -181,6 +191,11 @@ class _ArgumentViewState extends State<ArgumentView> {
         onChanged: isLocked ? null : onEnumChanged,
       ),
       'multi_enum' => MultiEnumDropdown(
+        exclusiveGroups: widget.taskName == 'MetaDemon' && model.title == 'mode'
+            ? const [
+                ['门票刷取：觉醒七层', '门票刷取：探索绘卷'],
+              ]
+            : const [],
         value: ArgumentModel.normalizeMultiEnumValue(model.value),
         options: model.enumEnum ?? const <String>[],
         errorText: errorText,
