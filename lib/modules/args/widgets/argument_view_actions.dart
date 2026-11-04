@@ -42,11 +42,7 @@ extension _ArgumentViewActions on _ArgumentViewState {
     _applyValue(value ?? '', 'time', useSetState: true);
   }
 
-  void _applyValue(
-    dynamic value,
-    String type, {
-    bool useSetState = false,
-  }) {
+  void _applyValue(dynamic value, String type, {bool useSetState = false}) {
     if (_isProtectedImmediateScheduleField) {
       return;
     }
@@ -64,6 +60,7 @@ extension _ArgumentViewActions on _ArgumentViewState {
         value,
         type,
       );
+      if (model.uiLayout != null) _argsController.groupsData.refresh();
       return;
     }
     if (useSetState) {
@@ -73,6 +70,7 @@ extension _ArgumentViewActions on _ArgumentViewState {
     } else {
       model.value = value;
     }
+    if (model.uiLayout != null) _argsController.groupsData.refresh();
     widget.setArgument(
       widget.scriptName,
       widget.taskName,

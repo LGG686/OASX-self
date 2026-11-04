@@ -72,11 +72,11 @@ class _ArgumentViewState extends State<ArgumentView> {
       final form = _buildFormSection();
       if (widget.compact) {
         return Tooltip(
-          message: model.description?.tr ?? '',
+          message: model.descriptionText,
           child: LayoutBuilder(
             builder: (context, constraints) => Row(
               children: [
-                Expanded(child: Text('${widget.label ?? model.title.tr}：')),
+                Expanded(child: Text('${widget.label ?? model.label}：')),
                 const SizedBox(width: 6),
                 SizedBox(
                   width: constraints.maxWidth * .5,
@@ -114,12 +114,12 @@ class _ArgumentViewState extends State<ArgumentView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SelectableText(
-          model.title.tr,
+          widget.label ?? model.label,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
-        if (model.description != null && model.description!.isNotEmpty)
+        if (model.descriptionText.isNotEmpty)
           SelectableText(
-            model.description!.tr,
+            model.descriptionText,
             style: Theme.of(context).textTheme.bodySmall,
           ).padding(top: 4),
       ],
@@ -167,7 +167,7 @@ class _ArgumentViewState extends State<ArgumentView> {
               (e) => DropdownMenuItem(
                 value: e.toString(),
                 child: Text(
-                  e.toString().tr,
+                  model.optionLabel(e.toString()),
                   style: Theme.of(context).textTheme.bodyLarge,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -180,7 +180,7 @@ class _ArgumentViewState extends State<ArgumentView> {
               (e) => Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  e.toString().tr,
+                  model.optionLabel(e.toString()),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyLarge,
@@ -191,11 +191,8 @@ class _ArgumentViewState extends State<ArgumentView> {
         onChanged: isLocked ? null : onEnumChanged,
       ),
       'multi_enum' => MultiEnumDropdown(
-        exclusiveGroups: widget.taskName == 'MetaDemon' && model.title == 'mode'
-            ? const [
-                ['门票刷取：觉醒七层', '门票刷取：探索绘卷'],
-              ]
-            : const [],
+        exclusiveGroups: model.exclusiveGroups,
+        labelBuilder: model.optionLabel,
         value: ArgumentModel.normalizeMultiEnumValue(model.value),
         options: model.enumEnum ?? const <String>[],
         errorText: errorText,

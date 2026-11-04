@@ -9,6 +9,7 @@ class MultiEnumDropdown extends StatefulWidget {
     this.errorText,
     this.enabled = true,
     this.exclusiveGroups = const [],
+    this.labelBuilder,
   });
 
   final List<String> value;
@@ -17,6 +18,7 @@ class MultiEnumDropdown extends StatefulWidget {
   final String? errorText;
   final bool enabled;
   final List<List<String>> exclusiveGroups;
+  final String Function(String)? labelBuilder;
 
   @override
   State<MultiEnumDropdown> createState() => _MultiEnumDropdownState();
@@ -44,7 +46,7 @@ class _MultiEnumDropdownState extends State<MultiEnumDropdown> {
     final selected = value.toSet();
     final label = options
         .where(selected.contains)
-        .map((option) => option.tr)
+        .map((option) => widget.labelBuilder?.call(option) ?? option.tr)
         .join(', ');
 
     return MenuAnchor(
@@ -87,7 +89,7 @@ class _MultiEnumDropdownState extends State<MultiEnumDropdown> {
                               }
                             : null,
                         child: Text(
-                          option.tr,
+                          widget.labelBuilder?.call(option) ?? option.tr,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

@@ -1,0 +1,453 @@
+{
+  "general_config": [
+    {
+      "name": "task_sequence",
+      "title": "\u6d3b\u52a8\u542f\u7528",
+      "ui_exclusive_groups": [
+        [
+          "\u63a2\u7d22",
+          "\u5927\u5bcc\u7fc1",
+          "\u4f2a\u795e"
+        ]
+      ],
+      "default": [
+        "\u722c\u5854"
+      ],
+      "value": [
+        "\u722c\u5854"
+      ],
+      "type": "multi_enum",
+      "enumEnum": [
+        "\u63a2\u7d22",
+        "\u5927\u5bcc\u7fc1",
+        "\u4f2a\u795e",
+        "\u722c\u5854",
+        "\u9996\u9886"
+      ],
+      "ui_group_title": {
+        "en_US": "general_config",
+        "zh_CN": "\u901a\u7528\u8bbe\u7f6e"
+      },
+      "ui_form": [
+        {
+          "type": "selection",
+          "field": "task_sequence"
+        },
+        {
+          "type": "selection",
+          "field": "climb_task_sequence"
+        },
+        {
+          "type": "mode",
+          "label": {
+            "en_US": "\u5927\u5bcc\u7fc1",
+            "zh_CN": "\u5927\u5bcc\u7fc1"
+          },
+          "children": [
+            {
+              "type": "field",
+              "field": "throw_limit",
+              "label": {
+                "en_US": "\u6295\u63b7\u6b21\u6570",
+                "zh_CN": "\u6295\u63b7\u6b21\u6570"
+              }
+            }
+          ]
+        },
+        {
+          "type": "mode",
+          "label": {
+            "en_US": "\u722c\u5854",
+            "zh_CN": "\u722c\u5854"
+          },
+          "children": [
+            {
+              "type": "row",
+              "children": [
+                {
+                  "type": "field",
+                  "field": "ap_limit",
+                  "label": {
+                    "en_US": "\u4f53\u529b",
+                    "zh_CN": "\u4f53\u529b"
+                  }
+                },
+                {
+                  "type": "field",
+                  "field": "ap100_limit",
+                  "label": {
+                    "en_US": "\u767e\u4f53",
+                    "zh_CN": "\u767e\u4f53"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "row",
+              "children": [
+                {
+                  "type": "csv",
+                  "field": "pass_limit",
+                  "index": 0,
+                  "length": 2,
+                  "separator": ",",
+                  "label": {
+                    "en_US": "\u7b80\u5355",
+                    "zh_CN": "\u7b80\u5355"
+                  }
+                },
+                {
+                  "type": "csv",
+                  "field": "pass_limit",
+                  "index": 1,
+                  "length": 2,
+                  "separator": ",",
+                  "label": {
+                    "en_US": "\u56f0\u96be",
+                    "zh_CN": "\u56f0\u96be"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "mode",
+          "label": {
+            "en_US": "\u4f2a\u795e",
+            "zh_CN": "\u4f2a\u795e"
+          },
+          "children": [
+            {
+              "type": "field",
+              "field": "fakegod_limit",
+              "label": {
+                "en_US": "\u884c\u52a8\u6b21\u6570",
+                "zh_CN": "\u884c\u52a8\u6b21\u6570"
+              }
+            }
+          ]
+        },
+        {
+          "type": "mode",
+          "label": {
+            "en_US": "\u9996\u9886",
+            "zh_CN": "\u9996\u9886"
+          },
+          "children": [
+            {
+              "type": "field",
+              "field": "boss_limit",
+              "label": {
+                "en_US": "\u6311\u6218\u6b21\u6570",
+                "zh_CN": "\u6311\u6218\u6b21\u6570"
+              }
+            }
+          ]
+        },
+        {
+          "type": "remaining",
+          "columns": 2
+        }
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "\u6d3b\u52a8\u542f\u7528",
+          "description": "",
+          "options": {
+            "\u63a2\u7d22": "\u63a2\u7d22",
+            "\u5927\u5bcc\u7fc1": "\u5927\u5bcc\u7fc1",
+            "\u4f2a\u795e": "\u4f2a\u795e",
+            "\u722c\u5854": "\u722c\u5854",
+            "\u9996\u9886": "\u9996\u9886"
+          }
+        },
+        "zh_CN": {
+          "title": "\u6d3b\u52a8\u542f\u7528",
+          "description": "",
+          "options": {
+            "\u63a2\u7d22": "\u63a2\u7d22",
+            "\u5927\u5bcc\u7fc1": "\u5927\u5bcc\u7fc1",
+            "\u4f2a\u795e": "\u4f2a\u795e",
+            "\u722c\u5854": "\u722c\u5854",
+            "\u9996\u9886": "\u9996\u9886"
+          }
+        }
+      }
+    },
+    {
+      "name": "throw_limit",
+      "title": "Throw Limit",
+      "default": 0,
+      "value": 0,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Throw Limit",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9ab0\u5b50\u6295\u63b7\u6b21\u6570\u9650\u5236",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "climb_task_sequence",
+      "title": "\u722c\u5854\u542f\u7528",
+      "default": [
+        "\u7b80\u5355"
+      ],
+      "value": [
+        "\u7b80\u5355"
+      ],
+      "type": "multi_enum",
+      "enumEnum": [
+        "\u4f53\u529b",
+        "\u7b80\u5355",
+        "\u56f0\u96be",
+        "\u767e\u4f53"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "\u722c\u5854\u542f\u7528",
+          "description": "",
+          "options": {
+            "\u4f53\u529b": "\u4f53\u529b",
+            "\u7b80\u5355": "\u7b80\u5355",
+            "\u56f0\u96be": "\u56f0\u96be",
+            "\u767e\u4f53": "\u767e\u4f53"
+          }
+        },
+        "zh_CN": {
+          "title": "\u722c\u5854\u542f\u7528",
+          "description": "",
+          "options": {
+            "\u4f53\u529b": "\u4f53\u529b",
+            "\u7b80\u5355": "\u7b80\u5355",
+            "\u56f0\u96be": "\u56f0\u96be",
+            "\u767e\u4f53": "\u767e\u4f53"
+          }
+        }
+      }
+    },
+    {
+      "name": "ap_limit",
+      "title": "Ap Limit",
+      "default": 0,
+      "value": 0,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Ap Limit",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u4f53\u529b\u6218\u6597\u6b21\u6570",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "pass_limit",
+      "title": "Pass Limit",
+      "description": "pass_limit_help",
+      "default": "0",
+      "value": "0",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Pass Limit",
+          "description": "pass_limit_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u95e8\u7968\u6218\u6597\u6b21\u6570",
+          "description": "\u683c\u5f0f\uff1a\u7b80\u5355\u6b21\u6570\uff0c\u6216\u7b80\u5355\u6b21\u6570,\u56f0\u96be\u6b21\u6570\uff1b0\u4e3a\u4e0d\u6267\u884c\u3002\u987a\u5e8f\uff1a\u56f0\u96be \u2192 \u7b80\u5355\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "boss_limit",
+      "title": "Boss Limit",
+      "default": 0,
+      "value": 0,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Boss Limit",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9996\u9886\u6218\u6597\u6b21\u6570",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "ap100_limit",
+      "title": "Ap100 Limit",
+      "default": 0,
+      "value": 0,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Ap100 Limit",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u767e\u4f53\u6218\u6597\u6b21\u6570",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "fakegod_limit",
+      "title": "Fakegod Limit",
+      "default": 0,
+      "value": 0,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Fakegod Limit",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u4f2a\u795e\u884c\u52a8\u6b21\u6570",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "limit_time",
+      "title": "Activity Limit Time",
+      "description": "activity_limit_time_help",
+      "default": "01:30:00",
+      "value": "01:30:00",
+      "type": "time",
+      "ui_text": {
+        "en_US": {
+          "title": "Activity Limit Time",
+          "description": "activity_limit_time_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u8fd0\u884c\u65f6\u95f4\u9650\u5236",
+          "description": "\u683c\u5f0f\uff1a\u65f6:\u5206:\u79d2\uff0c\u4f8b\u598201:30:00\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "active_souls_clean",
+      "title": "Active Souls Clean",
+      "description": "active_souls_clean_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Active Souls Clean",
+          "description": "active_souls_clean_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u8fd0\u884c\u7ed3\u675f\u540e\u6e05\u7406\u5fa1\u9b42",
+          "description": "\u52fe\u9009\u540e\u5728\u6d3b\u52a8\u7ed3\u675f\u65f6\u6e05\u7406\u5fa1\u9b42\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "random_sleep",
+      "title": "Activity Random Sleep",
+      "description": "activity_random_sleep_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Activity Random Sleep",
+          "description": "activity_random_sleep_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6267\u884c\u524d\u968f\u673a\u4f11\u7720",
+          "description": "\u52fe\u9009\u542f\u7528\u968f\u673a\u4f11\u7720\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "use_penta_pass",
+      "title": "Use Penta Pass",
+      "description": "use_penta_pass_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Use Penta Pass",
+          "description": "use_penta_pass_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u4f7f\u7528\u4e94\u500d\u5377",
+          "description": "\u52fe\u9009\u5728\u4f53\u529b\u722c\u5854\u4e2d\u4f7f\u7528\u4e94\u500d\u5377\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "climb_drink_break",
+      "title": "Climb Drink Break",
+      "description": "climb_drink_break_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Climb Drink Break",
+          "description": "climb_drink_break_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u722c\u5854\u559d\u6c34\u65f6\u95f4",
+          "description": "\u52fe\u9009\u542f\u7528\u722c\u5854\u559d\u6c34\u4f11\u606f\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "climb_drink_interval",
+      "title": "Climb Drink Interval",
+      "description": "climb_drink_interval_help",
+      "default": "60,120",
+      "value": "60,120",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Climb Drink Interval",
+          "description": "climb_drink_interval_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u722c\u5854\u559d\u6c34\u95f4\u9694\uff08\u5206\u949f\uff09",
+          "description": "\u683c\u5f0f\uff1a\u6700\u5c0f\u5206\u949f\u6570,\u6700\u5927\u5206\u949f\u6570\uff0c\u4f8b\u598260,120\u3002",
+          "options": {}
+        }
+      }
+    }
+  ]
+}

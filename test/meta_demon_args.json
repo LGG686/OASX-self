@@ -1,0 +1,1646 @@
+{
+  "settings_layout_config": [
+    {
+      "name": "merged_settings_enable",
+      "title": "\u5408\u5e76\u914d\u7f6e\u663e\u793a",
+      "description": "\u542f\u7528\u540e\u6309\u63a5\u53e3\u58f0\u660e\u7684\u9879\u76ee\u5408\u5e76\u914d\u7f6e\u5757\uff1b\u5173\u95ed\u540e\u9010\u5757\u663e\u793a\u5168\u90e8\u914d\u7f6e\u3002",
+      "default": true,
+      "value": true,
+      "type": "boolean",
+      "ui_layout": {
+        "version": 1,
+        "sections": [
+          {
+            "id": "scheduler",
+            "title": {
+              "en_US": "\u4efb\u52a1\u8c03\u5ea6",
+              "zh_CN": "\u4efb\u52a1\u8c03\u5ea6"
+            },
+            "groups": [
+              {
+                "name": "scheduler"
+              }
+            ]
+          },
+          {
+            "id": "general_config",
+            "title": {
+              "en_US": "\u901a\u7528\u8bbe\u7f6e",
+              "zh_CN": "\u901a\u7528\u8bbe\u7f6e"
+            },
+            "groups": [
+              {
+                "name": "meta_demon_config"
+              },
+              {
+                "name": "general_config"
+              }
+            ]
+          },
+          {
+            "id": "switch_soul_config",
+            "title": {
+              "en_US": "\u6267\u884c\u4efb\u52a1\u524d\u5207\u6362\u5fa1\u9b42",
+              "zh_CN": "\u6267\u884c\u4efb\u52a1\u524d\u5207\u6362\u5fa1\u9b42"
+            },
+            "variants": [
+              {
+                "id": "low_star",
+                "label": {
+                  "en_US": "\u4f4e\u661f\u9b3c\u738b",
+                  "zh_CN": "\u4f4e\u661f\u9b3c\u738b"
+                },
+                "groups": [
+                  {
+                    "name": "switch_soul_config",
+                    "fields": [
+                      "low_star_enable",
+                      "low_star_group_team",
+                      "low_star_by_name",
+                      "low_star_group_team_name"
+                    ],
+                    "labels": {
+                      "low_star_enable": {
+                        "en_US": "\u542f\u7528",
+                        "zh_CN": "\u542f\u7528"
+                      },
+                      "low_star_group_team": {
+                        "en_US": "\u5fa1\u9b42\u88c5\u914d\u5206\u7ec4\u8bbe\u7f6e",
+                        "zh_CN": "\u5fa1\u9b42\u88c5\u914d\u5206\u7ec4\u8bbe\u7f6e"
+                      },
+                      "low_star_by_name": {
+                        "en_US": "\u901a\u8fc7OCR\u6765\u5207\u6362\u5fa1\u9b42\u9884\u8bbe",
+                        "zh_CN": "\u901a\u8fc7OCR\u6765\u5207\u6362\u5fa1\u9b42\u9884\u8bbe"
+                      },
+                      "low_star_group_team_name": {
+                        "en_US": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+                        "zh_CN": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "high_star",
+                "label": {
+                  "en_US": "\u9ad8\u661f\u9b3c\u738b",
+                  "zh_CN": "\u9ad8\u661f\u9b3c\u738b"
+                },
+                "groups": [
+                  {
+                    "name": "switch_soul_config",
+                    "fields": [
+                      "high_star_enable",
+                      "high_star_group_team",
+                      "high_star_by_name",
+                      "high_star_group_team_name"
+                    ],
+                    "labels": {
+                      "high_star_enable": {
+                        "en_US": "\u542f\u7528",
+                        "zh_CN": "\u542f\u7528"
+                      },
+                      "high_star_group_team": {
+                        "en_US": "\u5fa1\u9b42\u88c5\u914d\u5206\u7ec4\u8bbe\u7f6e",
+                        "zh_CN": "\u5fa1\u9b42\u88c5\u914d\u5206\u7ec4\u8bbe\u7f6e"
+                      },
+                      "high_star_by_name": {
+                        "en_US": "\u901a\u8fc7OCR\u6765\u5207\u6362\u5fa1\u9b42\u9884\u8bbe",
+                        "zh_CN": "\u901a\u8fc7OCR\u6765\u5207\u6362\u5fa1\u9b42\u9884\u8bbe"
+                      },
+                      "high_star_group_team_name": {
+                        "en_US": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+                        "zh_CN": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "ticket_farming",
+                "label": {
+                  "en_US": "\u95e8\u7968\u5237\u53d6",
+                  "zh_CN": "\u95e8\u7968\u5237\u53d6"
+                },
+                "groups": [
+                  {
+                    "name": "switch_soul_config",
+                    "fields": [
+                      "ticket_farming_enable",
+                      "ticket_farming_group_team",
+                      "ticket_farming_by_name",
+                      "ticket_farming_group_team_name"
+                    ],
+                    "labels": {
+                      "ticket_farming_enable": {
+                        "en_US": "\u542f\u7528",
+                        "zh_CN": "\u542f\u7528"
+                      },
+                      "ticket_farming_group_team": {
+                        "en_US": "\u5fa1\u9b42\u88c5\u914d\u5206\u7ec4\u8bbe\u7f6e",
+                        "zh_CN": "\u5fa1\u9b42\u88c5\u914d\u5206\u7ec4\u8bbe\u7f6e"
+                      },
+                      "ticket_farming_by_name": {
+                        "en_US": "\u901a\u8fc7OCR\u6765\u5207\u6362\u5fa1\u9b42\u9884\u8bbe",
+                        "zh_CN": "\u901a\u8fc7OCR\u6765\u5207\u6362\u5fa1\u9b42\u9884\u8bbe"
+                      },
+                      "ticket_farming_group_team_name": {
+                        "en_US": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+                        "zh_CN": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "battle_config",
+            "title": {
+              "en_US": "\u6218\u6597\u914d\u7f6e",
+              "zh_CN": "\u6218\u6597\u914d\u7f6e"
+            },
+            "variants": [
+              {
+                "id": "low_star",
+                "label": {
+                  "en_US": "\u4f4e\u661f\u9b3c\u738b",
+                  "zh_CN": "\u4f4e\u661f\u9b3c\u738b"
+                },
+                "groups": [
+                  {
+                    "name": "low_star_battle_conf"
+                  }
+                ]
+              },
+              {
+                "id": "high_star",
+                "label": {
+                  "en_US": "\u9ad8\u661f\u9b3c\u738b",
+                  "zh_CN": "\u9ad8\u661f\u9b3c\u738b"
+                },
+                "groups": [
+                  {
+                    "name": "high_star_battle_conf"
+                  }
+                ]
+              },
+              {
+                "id": "ticket_farming",
+                "label": {
+                  "en_US": "\u95e8\u7968\u5237\u53d6",
+                  "zh_CN": "\u95e8\u7968\u5237\u53d6"
+                },
+                "groups": [
+                  {
+                    "name": "ticket_farming_battle_conf"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "quick_preset_config",
+            "title": {
+              "en_US": "\u5feb\u901f\u9884\u8bbe\u8be6\u60c5",
+              "zh_CN": "\u5feb\u901f\u9884\u8bbe\u8be6\u60c5"
+            },
+            "groups": [
+              {
+                "name": "quick_preset_config"
+              }
+            ]
+          }
+        ]
+      },
+      "ui_group_title": {
+        "en_US": "settings_layout_config",
+        "zh_CN": "\u914d\u7f6e\u663e\u793a\u8bbe\u7f6e"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "\u5408\u5e76\u914d\u7f6e\u663e\u793a",
+          "description": "\u542f\u7528\u540e\u6309\u63a5\u53e3\u58f0\u660e\u7684\u9879\u76ee\u5408\u5e76\u914d\u7f6e\u5757\uff1b\u5173\u95ed\u540e\u9010\u5757\u663e\u793a\u5168\u90e8\u914d\u7f6e\u3002",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5408\u5e76\u914d\u7f6e\u663e\u793a",
+          "description": "\u542f\u7528\u540e\u6309\u63a5\u53e3\u58f0\u660e\u7684\u9879\u76ee\u5408\u5e76\u914d\u7f6e\u5757\uff1b\u5173\u95ed\u540e\u9010\u5757\u663e\u793a\u5168\u90e8\u914d\u7f6e\u3002",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "scheduler": [
+    {
+      "name": "enable",
+      "title": "Enable",
+      "description": "enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "scheduler",
+        "zh_CN": "\u4efb\u52a1\u8c03\u5ea6"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "Enable",
+          "description": "Add this task to the scheduler",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u8be5\u529f\u80fd",
+          "description": "\u5c06\u8fd9\u4e2a\u4efb\u52a1\u52a0\u5165\u8c03\u5ea6\u5668",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "next_run",
+      "title": "Next Run",
+      "description": "next_run_help",
+      "default": "2023-01-01T00:00:00",
+      "value": "2023-01-01 00:00:00",
+      "type": "date_time",
+      "ui_text": {
+        "en_US": {
+          "title": "Next Run",
+          "description": "The time will be automatically calculated based on the interval below",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u4e0b\u4e00\u6b21\u8fd0\u884c\u65f6\u95f4",
+          "description": "\u4f1a\u6839\u636e\u4e0b\u9762\u7684\u95f4\u9694\u65f6\u95f4\u81ea\u52a8\u8ba1\u7b97\u65f6\u95f4",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "priority",
+      "title": "Priority",
+      "description": "priority_help",
+      "default": 5,
+      "value": 5,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Priority",
+          "description": "This option is valid if the scheduling rule is set to priority-based. The default is 5. The lower the number, the higher the priority. The range is [1-15]. If the priority is the same, tasks are scheduled on a first-come, first-served basis",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u4efb\u52a1\u4f18\u5148\u7ea7",
+          "description": "\u5982\u679c\u8bbe\u7f6e\u8c03\u5ea6\u89c4\u5219\u4e3a\u57fa\u4e8e\u4f18\u5148\u7ea7\uff0c\u5219\u8be5\u9009\u9879\u6709\u6548\uff0c\u9ed8\u8ba4\u4e3a5\uff0c\u6570\u5b57\u8d8a\u4f4e\u4f18\u5148\u7ea7\u8d8a\u9ad8\uff0c\u53ef\u53d6[1~15],\u5982\u679c\u540c\u4f18\u5148\u7ea7,\u5219\u6309\u7167\u5148\u6765\u540e\u5230\u89c4\u5219\u8fdb\u884c\u8c03\u5ea6",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "success_interval",
+      "title": "Success Interval",
+      "description": "success_interval_help",
+      "default": "P1D",
+      "value": "01 00:00:00",
+      "type": "time_delta",
+      "ui_text": {
+        "en_US": {
+          "title": "Success Interval",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6267\u884c\u4efb\u52a1\u6210\u529f\u540e\u8bbe\u5b9a\u7ecf\u8fc7 X \u65f6\u95f4\u540e\u6267\u884c",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "failure_interval",
+      "title": "Failure Interval",
+      "description": "failure_interval_help",
+      "default": "P1D",
+      "value": "01 00:00:00",
+      "type": "time_delta",
+      "ui_text": {
+        "en_US": {
+          "title": "Failure Interval",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6267\u884c\u4efb\u52a1\u5931\u8d25\u540e\u8bbe\u5b9a\u7ecf\u8fc7 X \u65f6\u95f4\u540e\u6267\u884c",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "float_time",
+      "title": "Float Time",
+      "description": "float_time_help",
+      "default": "00:00:00",
+      "value": "00:00:00",
+      "type": "time",
+      "ui_text": {
+        "en_US": {
+          "title": "Float Time",
+          "description": "To prevent account suspension, the next run time will be randomly delayed within this range; generally, three to five minutes is sufficient. When forced execution is enabled, ensure it does not exceed the window: for example, Kirin at 19:00 + 2 minutes, Demon Encounter at 17:00 + 1.5 hours, to avoid affecting other tasks",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u968f\u673a\u5ef6\u8fdf\u65f6\u95f4",
+          "description": "\u9632\u5c01\uff0c\u4e0b\u6b21\u8fd0\u884c\u65f6\u95f4\u5c06\u5728\u6b64\u8303\u56f4\u5185\u968f\u673a\u5ef6\u8fdf\uff0c\u4e00\u822c\u4e09\u4e94\u5206\u949f\u5373\u53ef\u3002\u6709\u5f3a\u5236\u6267\u884c\u65f6\uff0c\u786e\u4fdd\u4e0d\u8d85\u51fa\u7a97\u53e3\uff1a\u5982\u9e92\u9e9f19:00+2\u5206\u949f\uff0c\u9022\u9b5417:00+1.5\u5c0f\u65f6\uff0c\u907f\u514d\u5f71\u54cd\u5176\u4ed6\u4efb\u52a1",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "wait_interval",
+      "title": "Wait Interval",
+      "description": "\u75b2\u52b3\u5ea6\u6ee1\u65f6\u7b49\u591a\u957f\u65f6\u95f4\u540e\u518d\u6b21\u8fd0\u884c\u672c\u4efb\u52a1,\u5efa\u8bae\u8bbe\u7f6e\u7b49\u5f85\u5b8c\u5168\u6062\u590d\u75b2\u52b3\u5ea6\u6240\u9700\u7684\u65f6\u95f4\n\u4f8b:100\u5206\u949f\u6062\u590d100\u70b9\u75b2\u52b3\u5ea6,\u518d\u6b21\u8fd0\u884c\u5fc5\u5b9a\u53ef\u4ee5\u7ee7\u7eed\u6218\u6597",
+      "default": "PT1H40M",
+      "value": "00 01:40:00",
+      "type": "time_delta",
+      "ui_text": {
+        "en_US": {
+          "title": "Wait Interval",
+          "description": "\u75b2\u52b3\u5ea6\u6ee1\u65f6\u7b49\u591a\u957f\u65f6\u95f4\u540e\u518d\u6b21\u8fd0\u884c\u672c\u4efb\u52a1,\u5efa\u8bae\u8bbe\u7f6e\u7b49\u5f85\u5b8c\u5168\u6062\u590d\u75b2\u52b3\u5ea6\u6240\u9700\u7684\u65f6\u95f4\n\u4f8b:100\u5206\u949f\u6062\u590d100\u70b9\u75b2\u52b3\u5ea6,\u518d\u6b21\u8fd0\u884c\u5fc5\u5b9a\u53ef\u4ee5\u7ee7\u7eed\u6218\u6597",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "Wait Interval",
+          "description": "\u75b2\u52b3\u5ea6\u6ee1\u65f6\u7b49\u591a\u957f\u65f6\u95f4\u540e\u518d\u6b21\u8fd0\u884c\u672c\u4efb\u52a1,\u5efa\u8bae\u8bbe\u7f6e\u7b49\u5f85\u5b8c\u5168\u6062\u590d\u75b2\u52b3\u5ea6\u6240\u9700\u7684\u65f6\u95f4\n\u4f8b:100\u5206\u949f\u6062\u590d100\u70b9\u75b2\u52b3\u5ea6,\u518d\u6b21\u8fd0\u884c\u5fc5\u5b9a\u53ef\u4ee5\u7ee7\u7eed\u6218\u6597",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "meta_demon_config": [
+    {
+      "name": "mode",
+      "title": "\u8fd0\u884c\u6a21\u5f0f",
+      "description": "\u52fe\u9009\u6267\u884c\uff1b\u4e24\u79cd\u95e8\u7968\u5237\u53d6\u81f3\u591a\u9009\u4e00\u79cd\uff0c\u53ef\u4e0e\u9b3c\u738b\u6218\u6597\u5171\u5b58\uff0c\u5148\u5237\u95e8\u7968\u518d\u6218\u6597",
+      "ui_exclusive_groups": [
+        [
+          "\u95e8\u7968\u5237\u53d6\uff1a\u89c9\u9192\u4e03\u5c42",
+          "\u95e8\u7968\u5237\u53d6\uff1a\u63a2\u7d22"
+        ]
+      ],
+      "default": [
+        "\u9b3c\u738b\u6218\u6597"
+      ],
+      "value": [
+        "\u9b3c\u738b\u6218\u6597"
+      ],
+      "type": "multi_enum",
+      "enumEnum": [
+        "\u9b3c\u738b\u6218\u6597",
+        "\u95e8\u7968\u5237\u53d6\uff1a\u89c9\u9192\u4e03\u5c42",
+        "\u95e8\u7968\u5237\u53d6\uff1a\u63a2\u7d22"
+      ],
+      "ui_group_title": {
+        "en_US": "meta_demon_config",
+        "zh_CN": "\u8d85\u9b3c\u738b\u914d\u7f6e"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "\u8fd0\u884c\u6a21\u5f0f",
+          "description": "\u52fe\u9009\u6267\u884c\uff1b\u4e24\u79cd\u95e8\u7968\u5237\u53d6\u81f3\u591a\u9009\u4e00\u79cd\uff0c\u53ef\u4e0e\u9b3c\u738b\u6218\u6597\u5171\u5b58\uff0c\u5148\u5237\u95e8\u7968\u518d\u6218\u6597",
+          "options": {
+            "\u9b3c\u738b\u6218\u6597": "\u9b3c\u738b\u6218\u6597",
+            "\u95e8\u7968\u5237\u53d6\uff1a\u89c9\u9192\u4e03\u5c42": "\u95e8\u7968\u5237\u53d6\uff1a\u89c9\u9192\u4e03\u5c42",
+            "\u95e8\u7968\u5237\u53d6\uff1a\u63a2\u7d22": "\u95e8\u7968\u5237\u53d6\uff1a\u63a2\u7d22"
+          }
+        },
+        "zh_CN": {
+          "title": "\u8fd0\u884c\u6a21\u5f0f",
+          "description": "\u52fe\u9009\u6267\u884c\uff1b\u4e24\u79cd\u95e8\u7968\u5237\u53d6\u81f3\u591a\u9009\u4e00\u79cd\uff0c\u53ef\u4e0e\u9b3c\u738b\u6218\u6597\u5171\u5b58\uff0c\u5148\u5237\u95e8\u7968\u518d\u6218\u6597",
+          "options": {
+            "\u9b3c\u738b\u6218\u6597": "\u9b3c\u738b\u6218\u6597",
+            "\u95e8\u7968\u5237\u53d6\uff1a\u89c9\u9192\u4e03\u5c42": "\u95e8\u7968\u5237\u53d6\uff1a\u89c9\u9192\u4e03\u5c42",
+            "\u95e8\u7968\u5237\u53d6\uff1a\u63a2\u7d22": "\u95e8\u7968\u5237\u53d6\uff1a\u63a2\u7d22"
+          }
+        }
+      }
+    },
+    {
+      "name": "limit_time",
+      "title": "Limit Time",
+      "description": "limit_time_help",
+      "default": "00:45:00",
+      "value": "00:45:00",
+      "type": "time",
+      "ui_text": {
+        "en_US": {
+          "title": "Limit Time",
+          "description": "limit_time_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u8fd0\u884c\u65f6\u95f4\u9650\u5236",
+          "description": "\u8fbe\u5230\u9650\u5236\u65f6\u95f4\u540e\u4e0d\u518d\u5f00\u59cb\u4e0b\u4e00\u5c40\u6216\u4e0b\u4e00\u573a\u6218\u6597\uff0c\u5df2\u7ecf\u5f00\u59cb\u7684\u6218\u6597\u4f1a\u6b63\u5e38\u5b8c\u6210",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "limit_count",
+      "title": "Limit Count",
+      "description": "limit_count_help",
+      "default": 50,
+      "value": 50,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Limit Count",
+          "description": "limit_count_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9650\u5236\u6311\u6218\u6b21\u6570",
+          "description": "\u4e24\u4e2a\u9650\u5236\u9700\u8981\u540c\u65f6\u8bbe\u7f6e\uff0c\u6700\u5148\u8fbe\u5230\u5c31\u4f1a\u9000\u51fa\u3002\u5efa\u8bae\u6267\u884c\u65f6\u95f4\u8bbe\u7f6e\u6210\u4e00\u4e2a\u5c0f\u65f6\u8db3\u591f\u957f\uff0c\u6b64\u65f6\u57fa\u4e8e\u6b21\u6570\u6765\u5224\u5b9a\u8bbe\u7f6e\u4e3a100\u6b21",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "auto_tea",
+      "title": "Auto Tea",
+      "description": "\u75b2\u52b3\u5ea6\u6ee1\u65f6\u662f\u5426\u81ea\u52a8\u559d\u8336, \u5173\u95ed\u5219\u81ea\u52a8\u6839\u636e\u8c03\u5ea6\u5668\u7b49\u5f85\u95f4\u9694\u65f6\u95f4\u5b89\u6392\u4e0b\u4e00\u6b21\u8c03\u5ea6",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Auto Tea",
+          "description": "\u75b2\u52b3\u5ea6\u6ee1\u65f6\u662f\u5426\u81ea\u52a8\u559d\u8336, \u5173\u95ed\u5219\u81ea\u52a8\u6839\u636e\u8c03\u5ea6\u5668\u7b49\u5f85\u95f4\u9694\u65f6\u95f4\u5b89\u6392\u4e0b\u4e00\u6b21\u8c03\u5ea6",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u81ea\u52a8\u559d\u8336",
+          "description": "\u75b2\u52b3\u5ea6\u6ee1\u65f6\u662f\u5426\u81ea\u52a8\u559d\u8336, \u5173\u95ed\u5219\u81ea\u52a8\u6839\u636e\u8c03\u5ea6\u5668\u7b49\u5f85\u95f4\u9694\u65f6\u95f4\u5b89\u6392\u4e0b\u4e00\u6b21\u8c03\u5ea6",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "fire_sequence",
+      "title": "Fire Sequence",
+      "description": "\u653b\u51fb\u987a\u5e8f:\u4ece\u5de6\u5230\u53f3,\u7a7a\u683c\u5206\u9694(1:\u4e00\u661f\u9b3c\u738b,2:\u4e8c\u661f\u9b3c\u738b...)\n\u4f8b:3 2(\u5148\u653b\u51fb\u4e09\u661f\u9b3c\u738b\u7136\u540e\u4e8c\u661f\u9b3c\u738b)",
+      "default": "1 2 3 4",
+      "value": "1 2 3 4",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Fire Sequence",
+          "description": "\u653b\u51fb\u987a\u5e8f:\u4ece\u5de6\u5230\u53f3,\u7a7a\u683c\u5206\u9694(1:\u4e00\u661f\u9b3c\u738b,2:\u4e8c\u661f\u9b3c\u738b...)\n\u4f8b:3 2(\u5148\u653b\u51fb\u4e09\u661f\u9b3c\u738b\u7136\u540e\u4e8c\u661f\u9b3c\u738b)",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "Fire Sequence",
+          "description": "\u653b\u51fb\u987a\u5e8f:\u4ece\u5de6\u5230\u53f3,\u7a7a\u683c\u5206\u9694(1:\u4e00\u661f\u9b3c\u738b,2:\u4e8c\u661f\u9b3c\u738b...)\n\u4f8b:3 2(\u5148\u653b\u51fb\u4e09\u661f\u9b3c\u738b\u7136\u540e\u4e8c\u661f\u9b3c\u738b)",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "powerful_list",
+      "title": "Powerful List",
+      "description": "\u5f00\u542f\u5f3a\u529b\u9b3c\u738b\u5217\u8868(\u7a7a\u683c\u5206\u9694),\u4f8b:4 5(\u56db\u661f\u9b3c\u738b\u548c\u4e94\u661f\u9b3c\u738b\u5f00\u542f\u5f3a\u529b\u8ffd\u51fb)",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Powerful List",
+          "description": "\u5f00\u542f\u5f3a\u529b\u9b3c\u738b\u5217\u8868(\u7a7a\u683c\u5206\u9694),\u4f8b:4 5(\u56db\u661f\u9b3c\u738b\u548c\u4e94\u661f\u9b3c\u738b\u5f00\u542f\u5f3a\u529b\u8ffd\u51fb)",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "Powerful List",
+          "description": "\u5f00\u542f\u5f3a\u529b\u9b3c\u738b\u5217\u8868(\u7a7a\u683c\u5206\u9694),\u4f8b:4 5(\u56db\u661f\u9b3c\u738b\u548c\u4e94\u661f\u9b3c\u738b\u5f00\u542f\u5f3a\u529b\u8ffd\u51fb)",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "synthesis_list",
+      "title": "Synthesis List",
+      "description": "\u9b3c\u738b\u5408\u6210\u5217\u8868(\u7a7a\u683c\u5206\u9694),\u652f\u63011-5\u661f\u5408\u6210,\u4f8b:1 2 3(\u5408\u6210\u4e00\u661f,\u4e8c\u661f,\u4e09\u661f\u9b3c\u738b)",
+      "default": "1",
+      "value": "1",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Synthesis List",
+          "description": "\u9b3c\u738b\u5408\u6210\u5217\u8868(\u7a7a\u683c\u5206\u9694),\u652f\u63011-5\u661f\u5408\u6210,\u4f8b:1 2 3(\u5408\u6210\u4e00\u661f,\u4e8c\u661f,\u4e09\u661f\u9b3c\u738b)",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "Synthesis List",
+          "description": "\u9b3c\u738b\u5408\u6210\u5217\u8868(\u7a7a\u683c\u5206\u9694),\u652f\u63011-5\u661f\u5408\u6210,\u4f8b:1 2 3(\u5408\u6210\u4e00\u661f,\u4e8c\u661f,\u4e09\u661f\u9b3c\u738b)",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "general_config": [
+    {
+      "name": "high_star_quick_loadout_enable",
+      "title": "\u9ad8\u661f\u9b3c\u738b\u542f\u7528\u5feb\u901f\u4e0a\u9635",
+      "description": "\u4ec5\u4e94\u661f\u3001\u516d\u661f\u9b3c\u738b\u6218\u6597\u751f\u6548\uff1b\u4f7f\u7528\u5bf9\u5e94\u5fa1\u9b42\u914d\u7f6e\u4e2d\u7684\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d\u5feb\u901f\u4e0a\u9635\uff0c\u8df3\u8fc7\u5f0f\u795e\u5f55\u5207\u9b42\u4e0e\u6218\u6597\u51c6\u5907\u9884\u8bbe\u3002\u95e8\u7968\u5237\u53d6\u4ecd\u6309\u539f\u914d\u7f6e\u6267\u884c\u3002",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "general_config",
+        "zh_CN": "\u901a\u7528\u8bbe\u7f6e"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "\u9ad8\u661f\u9b3c\u738b\u542f\u7528\u5feb\u901f\u4e0a\u9635",
+          "description": "\u4ec5\u4e94\u661f\u3001\u516d\u661f\u9b3c\u738b\u6218\u6597\u751f\u6548\uff1b\u4f7f\u7528\u5bf9\u5e94\u5fa1\u9b42\u914d\u7f6e\u4e2d\u7684\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d\u5feb\u901f\u4e0a\u9635\uff0c\u8df3\u8fc7\u5f0f\u795e\u5f55\u5207\u9b42\u4e0e\u6218\u6597\u51c6\u5907\u9884\u8bbe\u3002\u95e8\u7968\u5237\u53d6\u4ecd\u6309\u539f\u914d\u7f6e\u6267\u884c\u3002",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9ad8\u661f\u9b3c\u738b\u542f\u7528\u5feb\u901f\u4e0a\u9635",
+          "description": "\u4ec5\u4e94\u661f\u3001\u516d\u661f\u9b3c\u738b\u6218\u6597\u751f\u6548\uff1b\u4f7f\u7528\u5bf9\u5e94\u5fa1\u9b42\u914d\u7f6e\u4e2d\u7684\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d\u5feb\u901f\u4e0a\u9635\uff0c\u8df3\u8fc7\u5f0f\u795e\u5f55\u5207\u9b42\u4e0e\u6218\u6597\u51c6\u5907\u9884\u8bbe\u3002\u95e8\u7968\u5237\u53d6\u4ecd\u6309\u539f\u914d\u7f6e\u6267\u884c\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "exploration_rotate",
+      "title": "\u63a2\u7d22\u81ea\u52a8\u6dfb\u52a0\u5019\u8865\u5f0f\u795e",
+      "description": "\u4e0e\u63a2\u7d22\u4efb\u52a1\u7684\u81ea\u52a8\u6dfb\u52a0\u5019\u8865\u5f0f\u795e\u4e00\u81f4\uff1a\u542f\u7528\u8f6e\u6362\u5e76\u81ea\u52a8\u8865\u5145\u5019\u8865\u5f0f\u795e\uff1b\u5173\u95ed\u65f6\u5173\u95ed\u8f6e\u6362\u3002",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u63a2\u7d22\u81ea\u52a8\u6dfb\u52a0\u5019\u8865\u5f0f\u795e",
+          "description": "\u4e0e\u63a2\u7d22\u4efb\u52a1\u7684\u81ea\u52a8\u6dfb\u52a0\u5019\u8865\u5f0f\u795e\u4e00\u81f4\uff1a\u542f\u7528\u8f6e\u6362\u5e76\u81ea\u52a8\u8865\u5145\u5019\u8865\u5f0f\u795e\uff1b\u5173\u95ed\u65f6\u5173\u95ed\u8f6e\u6362\u3002",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u63a2\u7d22\u81ea\u52a8\u6dfb\u52a0\u5019\u8865\u5f0f\u795e",
+          "description": "\u4e0e\u63a2\u7d22\u4efb\u52a1\u7684\u81ea\u52a8\u6dfb\u52a0\u5019\u8865\u5f0f\u795e\u4e00\u81f4\uff1a\u542f\u7528\u8f6e\u6362\u5e76\u81ea\u52a8\u8865\u5145\u5019\u8865\u5f0f\u795e\uff1b\u5173\u95ed\u65f6\u5173\u95ed\u8f6e\u6362\u3002",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "awake_buff_enable",
+      "title": "\u89c9\u9192\u542f\u7528\u52a0\u6210",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u89c9\u9192\u542f\u7528\u52a0\u6210",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u89c9\u9192\u542f\u7528\u52a0\u6210",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "exploration_target",
+      "title": "\u63a2\u7d22\u76ee\u6807",
+      "default": "\u5168\u90e8",
+      "value": "\u5168\u90e8",
+      "type": "enum",
+      "enumEnum": [
+        "\u5168\u90e8",
+        "\u91d1\u5e01",
+        "\u7ecf\u9a8c",
+        "\u8fbe\u6469"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "\u63a2\u7d22\u76ee\u6807",
+          "description": "",
+          "options": {
+            "\u5168\u90e8": "\u5168\u90e8",
+            "\u91d1\u5e01": "\u91d1\u5e01",
+            "\u7ecf\u9a8c": "\u7ecf\u9a8c",
+            "\u8fbe\u6469": "\u8fbe\u6469"
+          }
+        },
+        "zh_CN": {
+          "title": "\u63a2\u7d22\u76ee\u6807",
+          "description": "",
+          "options": {
+            "\u5168\u90e8": "\u5168\u90e8",
+            "\u91d1\u5e01": "\u91d1\u5e01",
+            "\u7ecf\u9a8c": "\u7ecf\u9a8c",
+            "\u8fbe\u6469": "\u8fbe\u6469"
+          }
+        }
+      }
+    }
+  ],
+  "switch_soul_config": [
+    {
+      "name": "low_star_enable",
+      "title": "\u6309\u7f16\u53f7\u5207\u6362",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "switch_soul_config",
+        "zh_CN": "\u6267\u884c\u4efb\u52a1\u524d\u5207\u6362\u5fa1\u9b42"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "\u6309\u7f16\u53f7\u5207\u6362",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6309\u7f16\u53f7\u5207\u6362",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "low_star_group_team",
+      "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+      "description": "switch_group_team_help",
+      "default": "-1,-1",
+      "value": "-1,-1",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+          "description": "The initial value is not suitable; you need to set it according to your own situation. \n'1,2' indicates the first preset group and the second team. \nPlease use a comma from the English input method. \nPreset groups support [1-7], and preset teams support [1-4]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+          "description": "\u521d\u59cb\u503c\u662f\u4e0d\u5408\u9002\u7684\uff0c\u4f60\u9700\u8981\u6839\u636e\u81ea\u5df1\u7684\u60c5\u51b5\u8bbe\u7f6e\n\"1,2\"\u8868\u793a\u7b2c\u4e00\u4e2a\u9884\u8bbe\u7ec4\uff0c\u7b2c\u4e8c\u4e2a\u961f\u4f0d\n\u8bf7\u4f7f\u7528\u82f1\u6587\u8f93\u5165\u6cd5\u4e0b\u7684\u9017\u53f7\n\u9884\u8bbe\u7ec4\u652f\u6301[1-7], \u9884\u8bbe\u961f\u4f0d\u652f\u6301[1-4]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "low_star_by_name",
+      "title": "\u6309\u540d\u79f0\u5207\u6362",
+      "description": "enable_switch_by_name_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u6309\u540d\u79f0\u5207\u6362",
+          "description": "This is another way to switch souls. Compared to the method above, it supports more presets, but similarly, you still need to ensure that the preset team is in a locked state",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6309\u540d\u79f0\u5207\u6362",
+          "description": "\u8fd9\u662f\u5207\u6362\u5fa1\u9b42\u7684\u53e6\u4e00\u79cd\u65b9\u5f0f\uff0c\u5bf9\u6bd4\u4e0a\u65b9\u7684\u65b9\u5f0f\u800c\u8a00\u652f\u6301\u66f4\u591a\u7684\u9884\u8bbe\uff0c\u4f46\u662f\u540c\u6837\u7684\u4f60\u8fd8\u786e\u4fdd\u9884\u8bbe\u961f\u4f0d\u662f\u9501\u5b9a\u72b6\u6001\u7684",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "low_star_group_team_name",
+      "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "high_star_enable",
+      "title": "\u6309\u7f16\u53f7\u5207\u6362",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u6309\u7f16\u53f7\u5207\u6362",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6309\u7f16\u53f7\u5207\u6362",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "high_star_group_team",
+      "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+      "description": "switch_group_team_help",
+      "default": "-1,-1",
+      "value": "-1,-1",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+          "description": "The initial value is not suitable; you need to set it according to your own situation. \n'1,2' indicates the first preset group and the second team. \nPlease use a comma from the English input method. \nPreset groups support [1-7], and preset teams support [1-4]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+          "description": "\u521d\u59cb\u503c\u662f\u4e0d\u5408\u9002\u7684\uff0c\u4f60\u9700\u8981\u6839\u636e\u81ea\u5df1\u7684\u60c5\u51b5\u8bbe\u7f6e\n\"1,2\"\u8868\u793a\u7b2c\u4e00\u4e2a\u9884\u8bbe\u7ec4\uff0c\u7b2c\u4e8c\u4e2a\u961f\u4f0d\n\u8bf7\u4f7f\u7528\u82f1\u6587\u8f93\u5165\u6cd5\u4e0b\u7684\u9017\u53f7\n\u9884\u8bbe\u7ec4\u652f\u6301[1-7], \u9884\u8bbe\u961f\u4f0d\u652f\u6301[1-4]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "high_star_by_name",
+      "title": "\u6309\u540d\u79f0\u5207\u6362",
+      "description": "enable_switch_by_name_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u6309\u540d\u79f0\u5207\u6362",
+          "description": "This is another way to switch souls. Compared to the method above, it supports more presets, but similarly, you still need to ensure that the preset team is in a locked state",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6309\u540d\u79f0\u5207\u6362",
+          "description": "\u8fd9\u662f\u5207\u6362\u5fa1\u9b42\u7684\u53e6\u4e00\u79cd\u65b9\u5f0f\uff0c\u5bf9\u6bd4\u4e0a\u65b9\u7684\u65b9\u5f0f\u800c\u8a00\u652f\u6301\u66f4\u591a\u7684\u9884\u8bbe\uff0c\u4f46\u662f\u540c\u6837\u7684\u4f60\u8fd8\u786e\u4fdd\u9884\u8bbe\u961f\u4f0d\u662f\u9501\u5b9a\u72b6\u6001\u7684",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "high_star_group_team_name",
+      "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "ticket_farming_enable",
+      "title": "\u6309\u7f16\u53f7\u5207\u6362",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u6309\u7f16\u53f7\u5207\u6362",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6309\u7f16\u53f7\u5207\u6362",
+          "description": "",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "ticket_farming_group_team",
+      "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+      "description": "switch_group_team_help",
+      "default": "-1,-1",
+      "value": "-1,-1",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+          "description": "The initial value is not suitable; you need to set it according to your own situation. \n'1,2' indicates the first preset group and the second team. \nPlease use a comma from the English input method. \nPreset groups support [1-7], and preset teams support [1-4]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5206\u7ec4\u3001\u961f\u53f7",
+          "description": "\u521d\u59cb\u503c\u662f\u4e0d\u5408\u9002\u7684\uff0c\u4f60\u9700\u8981\u6839\u636e\u81ea\u5df1\u7684\u60c5\u51b5\u8bbe\u7f6e\n\"1,2\"\u8868\u793a\u7b2c\u4e00\u4e2a\u9884\u8bbe\u7ec4\uff0c\u7b2c\u4e8c\u4e2a\u961f\u4f0d\n\u8bf7\u4f7f\u7528\u82f1\u6587\u8f93\u5165\u6cd5\u4e0b\u7684\u9017\u53f7\n\u9884\u8bbe\u7ec4\u652f\u6301[1-7], \u9884\u8bbe\u961f\u4f0d\u652f\u6301[1-4]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "ticket_farming_by_name",
+      "title": "\u6309\u540d\u79f0\u5207\u6362",
+      "description": "enable_switch_by_name_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "\u6309\u540d\u79f0\u5207\u6362",
+          "description": "This is another way to switch souls. Compared to the method above, it supports more presets, but similarly, you still need to ensure that the preset team is in a locked state",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6309\u540d\u79f0\u5207\u6362",
+          "description": "\u8fd9\u662f\u5207\u6362\u5fa1\u9b42\u7684\u53e6\u4e00\u79cd\u65b9\u5f0f\uff0c\u5bf9\u6bd4\u4e0a\u65b9\u7684\u65b9\u5f0f\u800c\u8a00\u652f\u6301\u66f4\u591a\u7684\u9884\u8bbe\uff0c\u4f46\u662f\u540c\u6837\u7684\u4f60\u8fd8\u786e\u4fdd\u9884\u8bbe\u961f\u4f0d\u662f\u9501\u5b9a\u72b6\u6001\u7684",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "ticket_farming_group_team_name",
+      "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+          "description": "",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u5206\u7ec4\u540d\u3001\u9884\u8bbe\u540d",
+          "description": "",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "quick_preset_config": [
+    {
+      "name": "high_star_custom_preset_enable",
+      "title": "\u6307\u5b9a\u9ad8\u661f\u5207\u6362\u9884\u8bbe",
+      "description": "\u6bcf\u6b21\u6311\u6218\u65b0\u9996\u9886\u65f6\u4e0a\u9635\u5bf9\u5e94\u9884\u8bbe\u5e76\u88c5\u914d\u4e00\u6b21\u5fa1\u9b42",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "quick_preset_config",
+        "zh_CN": "\u5feb\u901f\u9884\u8bbe\u8be6\u60c5"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "\u6307\u5b9a\u9ad8\u661f\u5207\u6362\u9884\u8bbe",
+          "description": "\u6bcf\u6b21\u6311\u6218\u65b0\u9996\u9886\u65f6\u4e0a\u9635\u5bf9\u5e94\u9884\u8bbe\u5e76\u88c5\u914d\u4e00\u6b21\u5fa1\u9b42",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6307\u5b9a\u9ad8\u661f\u5207\u6362\u9884\u8bbe",
+          "description": "\u6bcf\u6b21\u6311\u6218\u65b0\u9996\u9886\u65f6\u4e0a\u9635\u5bf9\u5e94\u9884\u8bbe\u5e76\u88c5\u914d\u4e00\u6b21\u5fa1\u9b42",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "high_star_custom_preset",
+      "title": "\u81ea\u5b9a\u4e49\u914d\u7f6e\u4e0a\u9635\u9884\u8bbe",
+      "description": "\u793a\u4f8b\uff1aboss_name:(\"\u9884\u8bbe\u7ec4\",\"\u9884\u8bbe\u540d\"); \u591a\u9879\u4ee5\u5206\u53f7\u5206\u9694\uff1bALL \u8868\u793a\u5176\u4ed6\u602a\u7269\u3002",
+      "default": "ALL:(1,1)",
+      "value": "ALL:(1,1)",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "\u81ea\u5b9a\u4e49\u914d\u7f6e\u4e0a\u9635\u9884\u8bbe",
+          "description": "\u793a\u4f8b\uff1aboss_name:(\"\u9884\u8bbe\u7ec4\",\"\u9884\u8bbe\u540d\"); \u591a\u9879\u4ee5\u5206\u53f7\u5206\u9694\uff1bALL \u8868\u793a\u5176\u4ed6\u602a\u7269\u3002",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u81ea\u5b9a\u4e49\u914d\u7f6e\u4e0a\u9635\u9884\u8bbe",
+          "description": "\u793a\u4f8b\uff1aboss_name:(\"\u9884\u8bbe\u7ec4\",\"\u9884\u8bbe\u540d\"); \u591a\u9879\u4ee5\u5206\u53f7\u5206\u9694\uff1bALL \u8868\u793a\u5176\u4ed6\u602a\u7269\u3002",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "low_star_battle_conf": [
+    {
+      "name": "lock_team_enable",
+      "title": "Lock Team Enable",
+      "description": "lock_team_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "low_star_battle_conf",
+        "zh_CN": "\u4f4e\u661f\u9b3c\u738b\u6218\u6597\u914d\u7f6e"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "Lock Team Enable",
+          "description": "If the team is locked, preset teams and buff features cannot be enabled",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9501\u5b9a\u9635\u5bb9",
+          "description": "\u5982\u679c\u9501\u5b9a\u9635\u5bb9\u5c06\u65e0\u6cd5\u542f\u7528\u9884\u8bbe\u961f\u4f0d\u3001\u52a0\u6210\u529f\u80fd",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_enable",
+      "title": "Preset Enable",
+      "description": "preset_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Enable",
+          "description": "The team preset will be switched during the first battle",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u5207\u6362\u9884\u8bbe\u961f\u4f0d",
+          "description": "\u5c06\u4f1a\u5728\u7b2c\u4e00\u6b21\u6218\u6597\u7684\u65f6\u5019\u5207\u6362\u961f\u4f0d\u9884\u8bbe",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_group",
+      "title": "Preset Group",
+      "description": "preset_group_help",
+      "default": 1,
+      "value": 1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Group",
+          "description": "Select[1~7]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7b2c X \u4e2a\u9884\u8bbe\u7ec4",
+          "description": "\u53ef\u9009[1~7]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_team",
+      "title": "Preset Team",
+      "description": "preset_team_help",
+      "default": 1,
+      "value": 1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Team",
+          "description": "Select[1~5]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7b2c X \u4e2a\u9884\u8bbe\u961f\u4f0d",
+          "description": "\u53ef\u9009[1~5]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "green_enable",
+      "title": "Green Enable",
+      "description": "green_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Green Enable",
+          "description": "Click the green mark at the moment the battle starts, with no feedback on the click",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u6211\u65b9\u7eff\u6807",
+          "description": "\u5728\u6218\u6597\u5f00\u59cb\u7684\u4e00\u77ac\u95f4\u70b9\u51fb\u7eff\u6807\uff0c\u65e0\u53cd\u9988\u70b9\u51fb",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "green_mark_type",
+      "title": "green_mark_type",
+      "default": "choose",
+      "value": "choose",
+      "type": "enum",
+      "enumEnum": [
+        "choose",
+        "name"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "green_mark_type",
+          "description": "",
+          "options": {
+            "choose": "choose",
+            "name": "name"
+          }
+        },
+        "zh_CN": {
+          "title": "\u7eff\u6807\u7c7b\u578b",
+          "description": "",
+          "options": {
+            "choose": "\u9009\u62e9",
+            "name": "\u540d\u79f0"
+          }
+        }
+      }
+    },
+    {
+      "name": "green_mark",
+      "title": "green_mark",
+      "description": "green_mark_help",
+      "default": "green_left1",
+      "value": "green_left1",
+      "type": "enum",
+      "enumEnum": [
+        "green_left1",
+        "green_left2",
+        "green_left3",
+        "green_left4",
+        "green_left5",
+        "green_main"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "green_mark",
+          "description": "Select from [Left 1, Left 2, Left 3, Left 4, Left 5, Main Onmyoji]",
+          "options": {
+            "green_left1": "green_left1",
+            "green_left2": "green_left2",
+            "green_left3": "green_left3",
+            "green_left4": "green_left4",
+            "green_left5": "green_left5",
+            "green_main": "green_main"
+          }
+        },
+        "zh_CN": {
+          "title": "\u8bbe\u7f6e\u7b2c X \u4e2a\u5f0f\u795e\u4e3a\u7eff\u6807",
+          "description": "\u53ef\u9009[\u5de6\u4e00, \u5de6\u4e8c, \u5de6\u4e09, \u5de6\u56db, \u5de6\u4e94, \u4e3b\u9634\u9633\u5e08]",
+          "options": {
+            "green_left1": "green_left1",
+            "green_left2": "green_left2",
+            "green_left3": "green_left3",
+            "green_left4": "green_left4",
+            "green_left5": "green_left5",
+            "green_main": "green_main"
+          }
+        }
+      }
+    },
+    {
+      "name": "green_mark_name",
+      "title": "Green Mark Name",
+      "description": "green_mark_name_help",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Green Mark Name",
+          "description": "green_mark_name_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7eff\u6807\u540d\u79f0",
+          "description": "\u6309\u7167\u76f8\u4f3c\u5ea6\u8bc6\u522b, \u5931\u8d25\u5219\u586b\u5199\u65e5\u5fd7\u4e2d\u5339\u914d\u5230\u7684\u6700\u76f8\u4f3c\u6587\u5b57\u6216\u6539\u540d",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "random_click_swipt_enable",
+      "title": "Random Click Swipt Enable",
+      "description": "random_click_swipt_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Random Click Swipt Enable",
+          "description": "Anti-blocking optimization: may trigger 0-8 times in every three minutes of battle. Please note that this conflicts with the green mark function and may cause random clicks on the green mark",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6218\u6597\u65f6\u968f\u673a\u70b9\u51fb\u6216\u8005\u968f\u673a\u6ed1\u52a8",
+          "description": "\u9632\u5c01\u4f18\u5316\uff0c\u6bcf\u4e09\u5206\u949f\u7684\u6218\u6597\u53ef\u80fd\u89e6\u53d10~8\u6b21\uff0c\u8bf7\u6ce8\u610f\u8fd9\u4e2a\u4e0e\u7eff\u6807\u529f\u80fd\u51b2\u7a81\uff0c\u53ef\u80fd\u4f1a\u4e71\u70b9\u7eff\u6807",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "battle_timeout",
+      "title": "Battle Timeout",
+      "description": "battle_timeout_help",
+      "default": -1,
+      "value": -1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Battle Timeout",
+          "description": "battle_timeout_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6218\u6597\u8d85\u65f6\u65f6\u95f4",
+          "description": "\u5355\u4f4d\u79d2,-1\u8868\u793a\u6309\u7167\u5168\u5c40\u6218\u6597\u914d\u7f6e,\u8d85\u65f6\u5219\u81ea\u52a8\u9000\u51fa\u5bf9\u5c40",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "high_star_battle_conf": [
+    {
+      "name": "lock_team_enable",
+      "title": "Lock Team Enable",
+      "description": "lock_team_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "high_star_battle_conf",
+        "zh_CN": "\u9ad8\u661f\u9b3c\u738b\u6218\u6597\u914d\u7f6e"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "Lock Team Enable",
+          "description": "If the team is locked, preset teams and buff features cannot be enabled",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9501\u5b9a\u9635\u5bb9",
+          "description": "\u5982\u679c\u9501\u5b9a\u9635\u5bb9\u5c06\u65e0\u6cd5\u542f\u7528\u9884\u8bbe\u961f\u4f0d\u3001\u52a0\u6210\u529f\u80fd",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_enable",
+      "title": "Preset Enable",
+      "description": "preset_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Enable",
+          "description": "The team preset will be switched during the first battle",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u5207\u6362\u9884\u8bbe\u961f\u4f0d",
+          "description": "\u5c06\u4f1a\u5728\u7b2c\u4e00\u6b21\u6218\u6597\u7684\u65f6\u5019\u5207\u6362\u961f\u4f0d\u9884\u8bbe",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_group",
+      "title": "Preset Group",
+      "description": "preset_group_help",
+      "default": 1,
+      "value": 1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Group",
+          "description": "Select[1~7]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7b2c X \u4e2a\u9884\u8bbe\u7ec4",
+          "description": "\u53ef\u9009[1~7]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_team",
+      "title": "Preset Team",
+      "description": "preset_team_help",
+      "default": 1,
+      "value": 1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Team",
+          "description": "Select[1~5]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7b2c X \u4e2a\u9884\u8bbe\u961f\u4f0d",
+          "description": "\u53ef\u9009[1~5]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "green_enable",
+      "title": "Green Enable",
+      "description": "green_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Green Enable",
+          "description": "Click the green mark at the moment the battle starts, with no feedback on the click",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u6211\u65b9\u7eff\u6807",
+          "description": "\u5728\u6218\u6597\u5f00\u59cb\u7684\u4e00\u77ac\u95f4\u70b9\u51fb\u7eff\u6807\uff0c\u65e0\u53cd\u9988\u70b9\u51fb",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "green_mark_type",
+      "title": "green_mark_type",
+      "default": "choose",
+      "value": "choose",
+      "type": "enum",
+      "enumEnum": [
+        "choose",
+        "name"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "green_mark_type",
+          "description": "",
+          "options": {
+            "choose": "choose",
+            "name": "name"
+          }
+        },
+        "zh_CN": {
+          "title": "\u7eff\u6807\u7c7b\u578b",
+          "description": "",
+          "options": {
+            "choose": "\u9009\u62e9",
+            "name": "\u540d\u79f0"
+          }
+        }
+      }
+    },
+    {
+      "name": "green_mark",
+      "title": "green_mark",
+      "description": "green_mark_help",
+      "default": "green_left1",
+      "value": "green_left1",
+      "type": "enum",
+      "enumEnum": [
+        "green_left1",
+        "green_left2",
+        "green_left3",
+        "green_left4",
+        "green_left5",
+        "green_main"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "green_mark",
+          "description": "Select from [Left 1, Left 2, Left 3, Left 4, Left 5, Main Onmyoji]",
+          "options": {
+            "green_left1": "green_left1",
+            "green_left2": "green_left2",
+            "green_left3": "green_left3",
+            "green_left4": "green_left4",
+            "green_left5": "green_left5",
+            "green_main": "green_main"
+          }
+        },
+        "zh_CN": {
+          "title": "\u8bbe\u7f6e\u7b2c X \u4e2a\u5f0f\u795e\u4e3a\u7eff\u6807",
+          "description": "\u53ef\u9009[\u5de6\u4e00, \u5de6\u4e8c, \u5de6\u4e09, \u5de6\u56db, \u5de6\u4e94, \u4e3b\u9634\u9633\u5e08]",
+          "options": {
+            "green_left1": "green_left1",
+            "green_left2": "green_left2",
+            "green_left3": "green_left3",
+            "green_left4": "green_left4",
+            "green_left5": "green_left5",
+            "green_main": "green_main"
+          }
+        }
+      }
+    },
+    {
+      "name": "green_mark_name",
+      "title": "Green Mark Name",
+      "description": "green_mark_name_help",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Green Mark Name",
+          "description": "green_mark_name_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7eff\u6807\u540d\u79f0",
+          "description": "\u6309\u7167\u76f8\u4f3c\u5ea6\u8bc6\u522b, \u5931\u8d25\u5219\u586b\u5199\u65e5\u5fd7\u4e2d\u5339\u914d\u5230\u7684\u6700\u76f8\u4f3c\u6587\u5b57\u6216\u6539\u540d",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "random_click_swipt_enable",
+      "title": "Random Click Swipt Enable",
+      "description": "random_click_swipt_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Random Click Swipt Enable",
+          "description": "Anti-blocking optimization: may trigger 0-8 times in every three minutes of battle. Please note that this conflicts with the green mark function and may cause random clicks on the green mark",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6218\u6597\u65f6\u968f\u673a\u70b9\u51fb\u6216\u8005\u968f\u673a\u6ed1\u52a8",
+          "description": "\u9632\u5c01\u4f18\u5316\uff0c\u6bcf\u4e09\u5206\u949f\u7684\u6218\u6597\u53ef\u80fd\u89e6\u53d10~8\u6b21\uff0c\u8bf7\u6ce8\u610f\u8fd9\u4e2a\u4e0e\u7eff\u6807\u529f\u80fd\u51b2\u7a81\uff0c\u53ef\u80fd\u4f1a\u4e71\u70b9\u7eff\u6807",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "battle_timeout",
+      "title": "Battle Timeout",
+      "description": "battle_timeout_help",
+      "default": -1,
+      "value": -1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Battle Timeout",
+          "description": "battle_timeout_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6218\u6597\u8d85\u65f6\u65f6\u95f4",
+          "description": "\u5355\u4f4d\u79d2,-1\u8868\u793a\u6309\u7167\u5168\u5c40\u6218\u6597\u914d\u7f6e,\u8d85\u65f6\u5219\u81ea\u52a8\u9000\u51fa\u5bf9\u5c40",
+          "options": {}
+        }
+      }
+    }
+  ],
+  "ticket_farming_battle_conf": [
+    {
+      "name": "lock_team_enable",
+      "title": "Lock Team Enable",
+      "description": "lock_team_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_group_title": {
+        "en_US": "ticket_farming_battle_conf",
+        "zh_CN": "\u95e8\u7968\u5237\u53d6\u6218\u6597\u914d\u7f6e"
+      },
+      "ui_text": {
+        "en_US": {
+          "title": "Lock Team Enable",
+          "description": "If the team is locked, preset teams and buff features cannot be enabled",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u9501\u5b9a\u9635\u5bb9",
+          "description": "\u5982\u679c\u9501\u5b9a\u9635\u5bb9\u5c06\u65e0\u6cd5\u542f\u7528\u9884\u8bbe\u961f\u4f0d\u3001\u52a0\u6210\u529f\u80fd",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_enable",
+      "title": "Preset Enable",
+      "description": "preset_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Enable",
+          "description": "The team preset will be switched during the first battle",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u5207\u6362\u9884\u8bbe\u961f\u4f0d",
+          "description": "\u5c06\u4f1a\u5728\u7b2c\u4e00\u6b21\u6218\u6597\u7684\u65f6\u5019\u5207\u6362\u961f\u4f0d\u9884\u8bbe",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_group",
+      "title": "Preset Group",
+      "description": "preset_group_help",
+      "default": 1,
+      "value": 1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Group",
+          "description": "Select[1~7]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7b2c X \u4e2a\u9884\u8bbe\u7ec4",
+          "description": "\u53ef\u9009[1~7]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "preset_team",
+      "title": "Preset Team",
+      "description": "preset_team_help",
+      "default": 1,
+      "value": 1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Preset Team",
+          "description": "Select[1~5]",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7b2c X \u4e2a\u9884\u8bbe\u961f\u4f0d",
+          "description": "\u53ef\u9009[1~5]",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "green_enable",
+      "title": "Green Enable",
+      "description": "green_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Green Enable",
+          "description": "Click the green mark at the moment the battle starts, with no feedback on the click",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u542f\u7528\u6211\u65b9\u7eff\u6807",
+          "description": "\u5728\u6218\u6597\u5f00\u59cb\u7684\u4e00\u77ac\u95f4\u70b9\u51fb\u7eff\u6807\uff0c\u65e0\u53cd\u9988\u70b9\u51fb",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "green_mark_type",
+      "title": "green_mark_type",
+      "default": "choose",
+      "value": "choose",
+      "type": "enum",
+      "enumEnum": [
+        "choose",
+        "name"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "green_mark_type",
+          "description": "",
+          "options": {
+            "choose": "choose",
+            "name": "name"
+          }
+        },
+        "zh_CN": {
+          "title": "\u7eff\u6807\u7c7b\u578b",
+          "description": "",
+          "options": {
+            "choose": "\u9009\u62e9",
+            "name": "\u540d\u79f0"
+          }
+        }
+      }
+    },
+    {
+      "name": "green_mark",
+      "title": "green_mark",
+      "description": "green_mark_help",
+      "default": "green_left1",
+      "value": "green_left1",
+      "type": "enum",
+      "enumEnum": [
+        "green_left1",
+        "green_left2",
+        "green_left3",
+        "green_left4",
+        "green_left5",
+        "green_main"
+      ],
+      "ui_text": {
+        "en_US": {
+          "title": "green_mark",
+          "description": "Select from [Left 1, Left 2, Left 3, Left 4, Left 5, Main Onmyoji]",
+          "options": {
+            "green_left1": "green_left1",
+            "green_left2": "green_left2",
+            "green_left3": "green_left3",
+            "green_left4": "green_left4",
+            "green_left5": "green_left5",
+            "green_main": "green_main"
+          }
+        },
+        "zh_CN": {
+          "title": "\u8bbe\u7f6e\u7b2c X \u4e2a\u5f0f\u795e\u4e3a\u7eff\u6807",
+          "description": "\u53ef\u9009[\u5de6\u4e00, \u5de6\u4e8c, \u5de6\u4e09, \u5de6\u56db, \u5de6\u4e94, \u4e3b\u9634\u9633\u5e08]",
+          "options": {
+            "green_left1": "green_left1",
+            "green_left2": "green_left2",
+            "green_left3": "green_left3",
+            "green_left4": "green_left4",
+            "green_left5": "green_left5",
+            "green_main": "green_main"
+          }
+        }
+      }
+    },
+    {
+      "name": "green_mark_name",
+      "title": "Green Mark Name",
+      "description": "green_mark_name_help",
+      "default": "",
+      "value": "",
+      "type": "string",
+      "ui_text": {
+        "en_US": {
+          "title": "Green Mark Name",
+          "description": "green_mark_name_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u7eff\u6807\u540d\u79f0",
+          "description": "\u6309\u7167\u76f8\u4f3c\u5ea6\u8bc6\u522b, \u5931\u8d25\u5219\u586b\u5199\u65e5\u5fd7\u4e2d\u5339\u914d\u5230\u7684\u6700\u76f8\u4f3c\u6587\u5b57\u6216\u6539\u540d",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "random_click_swipt_enable",
+      "title": "Random Click Swipt Enable",
+      "description": "random_click_swipt_enable_help",
+      "default": false,
+      "value": false,
+      "type": "boolean",
+      "ui_text": {
+        "en_US": {
+          "title": "Random Click Swipt Enable",
+          "description": "Anti-blocking optimization: may trigger 0-8 times in every three minutes of battle. Please note that this conflicts with the green mark function and may cause random clicks on the green mark",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6218\u6597\u65f6\u968f\u673a\u70b9\u51fb\u6216\u8005\u968f\u673a\u6ed1\u52a8",
+          "description": "\u9632\u5c01\u4f18\u5316\uff0c\u6bcf\u4e09\u5206\u949f\u7684\u6218\u6597\u53ef\u80fd\u89e6\u53d10~8\u6b21\uff0c\u8bf7\u6ce8\u610f\u8fd9\u4e2a\u4e0e\u7eff\u6807\u529f\u80fd\u51b2\u7a81\uff0c\u53ef\u80fd\u4f1a\u4e71\u70b9\u7eff\u6807",
+          "options": {}
+        }
+      }
+    },
+    {
+      "name": "battle_timeout",
+      "title": "Battle Timeout",
+      "description": "battle_timeout_help",
+      "default": -1,
+      "value": -1,
+      "type": "integer",
+      "ui_text": {
+        "en_US": {
+          "title": "Battle Timeout",
+          "description": "battle_timeout_help",
+          "options": {}
+        },
+        "zh_CN": {
+          "title": "\u6218\u6597\u8d85\u65f6\u65f6\u95f4",
+          "description": "\u5355\u4f4d\u79d2,-1\u8868\u793a\u6309\u7167\u5168\u5c40\u6218\u6597\u914d\u7f6e,\u8d85\u65f6\u5219\u81ea\u52a8\u9000\u51fa\u5bf9\u5c40",
+          "options": {}
+        }
+      }
+    }
+  ]
+}

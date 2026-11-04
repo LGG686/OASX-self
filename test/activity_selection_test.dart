@@ -1,6 +1,5 @@
+import 'dart:convert';
 import 'dart:io';
-import 'dart:ui' as ui;
-import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +10,13 @@ void main() {
     tester,
   ) async {
     final controller = Get.put(ArgsController());
+    final saved = <String, dynamic>{};
     addTearDown(Get.reset);
+    final payload =
+        jsonDecode(File('test/activity_args.json').readAsStringSync())
+            as Map<String, dynamic>;
+    final definitions = (payload['general_config'] as List)
+        .cast<Map<String, dynamic>>();
     final rows = <Map<String, dynamic>>[
       {
         'name': 'task_sequence',
@@ -42,7 +47,14 @@ void main() {
     ];
     final group = GroupsModel(
       groupName: 'general_config',
-      members: rows.map(ArgumentModel.fromJson).toList(),
+      members: rows
+          .map(
+            (row) => ArgumentModel.fromJson({
+              ...definitions.firstWhere((d) => d['name'] == row['name']),
+              ...row,
+            }),
+          )
+          .toList(),
     );
     controller.groupsData.value = {'general_config': group};
     final boundary = GlobalKey();
@@ -54,11 +66,13 @@ void main() {
               key: boundary,
               child: SizedBox(
                 width: 720,
-                child: ActivityGeneralSettings(
+                child: ApiFormSettings(
                   script: 'TEST',
                   task: 'ActivityShikigami',
                   group: group,
-                  onChanged: (_, _, _, _, _, _) {},
+                  onChanged: (_, _, _, argument, _, value) =>
+                      saved[argument] = value,
+                  form: definitions.first['ui_form'] as List,
                 ),
               ),
             ),
@@ -67,7 +81,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(ActivitySelectionDropdown), findsNWidgets(2));
+    expect(find.byType(SettingsSelectionRow), findsNWidgets(2));
     final checks = tester.widgetList<Checkbox>(find.byType(Checkbox));
     expect(checks.length, 4);
     final positions = find
@@ -77,17 +91,13 @@ void main() {
         .toList();
     expect(positions[0], closeTo(positions[2], .1));
     expect(positions[1], closeTo(positions[3], .1));
+    await tester.enterText(
+      find.byKey(const ValueKey('csv-pass_limit-1-TEST')),
+      '41',
+    );
+    await tester.pump();
+    expect(saved['pass_limit'], '30,41');
     expect(tester.takeException(), isNull);
-    await tester.runAsync(() async {
-      final image =
-          await (boundary.currentContext!.findRenderObject()
-                  as RenderRepaintBoundary)
-              .toImage();
-      final data = await image.toByteData(format: ui.ImageByteFormat.png);
-      final file = File('build/activity-settings-preview.png');
-      await file.writeAsBytes(data!.buffer.asUint8List());
-      image.dispose();
-    });
   });
 
   testWidgets(

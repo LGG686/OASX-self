@@ -28,8 +28,8 @@ part 'widgets/time_picker.dart';
 part 'widgets/argument_view.dart';
 part 'widgets/argument_view_actions.dart';
 part 'widgets/multi_enum_dropdown.dart';
-part 'widgets/activity_general_settings.dart';
-part 'widgets/activity_settings_groups.dart';
+part 'widgets/api_form_settings.dart';
+part 'widgets/api_settings_groups.dart';
 part 'controllers/args_controller.dart';
 
 typedef SetArgumentCallback =
@@ -51,6 +51,17 @@ typedef SaveArgumentCallback =
       String type,
       dynamic value,
     );
+
+String settingsText(dynamic value) {
+  if (value is Map) {
+    return (value[Get.locale?.toString()] ??
+            value['zh_CN'] ??
+            value.values.firstOrNull ??
+            '')
+        .toString();
+  }
+  return value?.toString() ?? '';
+}
 
 class Args extends StatelessWidget {
   const Args({
@@ -88,18 +99,29 @@ class Args extends StatelessWidget {
             .trim();
         final selectedTask = (taskName ?? Get.parameters['task'] ?? '').trim();
         final groupNames = controller.groupsName.value;
+        Map<String, dynamic>? layout;
+        for (final group in controller.groupsData.value.values) {
+          for (final argument in group.members.cast<ArgumentModel>()) {
+            if (argument.value == true &&
+                argument.uiLayout?['version'] == 1 &&
+                argument.uiLayout?['sections'] is List) {
+              layout = argument.uiLayout;
+            }
+          }
+        }
         final content = LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                child: selectedTask == 'ActivityShikigami'
-                    ? ActivitySettingsGroups(
+                child: layout != null
+                    ? ApiSettingsGroups(
                         args: this,
                         script: selectedScript,
                         task: selectedTask,
                         groupNames: groupNames,
+                        layout: layout,
                       )
                     : ExpansionTileGroup(
                         spaceBetweenItem: 10,
@@ -130,7 +152,7 @@ class Args extends StatelessWidget {
                                           selectedTask,
                                           name,
                                         ),
-                                      Text(name.tr),
+                                      Text(_groupTitle(name)),
                                     ].toRow(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
@@ -166,6 +188,16 @@ class Args extends StatelessWidget {
     );
   }
 
+  String _groupTitle(String name) {
+    final group = Get.find<ArgsController>().groupsData.value[name];
+    final title = group?.members
+        .cast<ArgumentModel>()
+        .map((m) => m.uiGroupTitle)
+        .where((v) => v != null)
+        .firstOrNull;
+    return title == null ? name.tr : settingsText(title);
+  }
+
   List<Widget> _children({
     required String groupName,
     required String selectedScript,
@@ -174,13 +206,19 @@ class Args extends StatelessWidget {
     final controller = Get.find<ArgsController>();
     final setArgument = setArgumentOverride ?? controller.setArgument;
     final groupsModel = controller.groupsData.value[groupName]!;
-    if (selectedTask == 'ActivityShikigami' && groupName == 'general_config') {
+    final form = groupsModel.members
+        .cast<ArgumentModel>()
+        .map((m) => m.uiForm)
+        .whereType<List<dynamic>>()
+        .firstOrNull;
+    if (form != null) {
       return [
-        ActivityGeneralSettings(
+        ApiFormSettings(
           script: selectedScript,
           task: selectedTask,
           group: groupsModel,
           onChanged: setArgument,
+          form: form,
         ),
       ];
     }
