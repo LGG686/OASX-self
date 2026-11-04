@@ -40,7 +40,7 @@ void main() {
     },
   );
   testWidgets(
-    'API layout supports arbitrary tasks and disabling restores all groups',
+    'hidden backend layout control preserves layout and server can disable it',
     (tester) async {
       final controller = Get.put(ArgsController());
       addTearDown(Get.reset);
@@ -48,6 +48,7 @@ void main() {
         'display': [
           {
             'name': 'enabled',
+            'ui_hidden': true,
             'type': 'boolean',
             'value': true,
             'ui_layout': {
@@ -125,8 +126,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('second_value'), findsOneWidget);
       expect(find.text('first_value'), findsNothing);
-      await tester.ensureVisible(find.byType(Checkbox));
-      await tester.tap(find.byType(Checkbox));
+      expect(find.byType(Checkbox), findsNothing);
+      expect(find.text('display'), findsNothing);
+      controller.findArgument('display', 'enabled')!.value = false;
+      controller.groupsData.refresh();
       await tester.pumpAndSettle();
       expect(find.text('API combined section'), findsNothing);
       expect(find.text('first_group'), findsOneWidget);

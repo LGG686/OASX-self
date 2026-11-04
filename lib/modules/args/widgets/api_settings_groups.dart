@@ -59,6 +59,7 @@ class _ApiSettingsGroupsState extends State<ApiSettingsGroups> {
           (e) => (e as ArgumentModel).title == field,
         );
         if (index < 0) continue;
+        if ((group.members[index] as ArgumentModel).uiHidden) continue;
         result.add(
           ArgumentView(
             key: ValueKey('${widget.script}-$name-$field'),

@@ -98,7 +98,15 @@ class Args extends StatelessWidget {
         final selectedScript = (scriptName ?? Get.parameters['script'] ?? '')
             .trim();
         final selectedTask = (taskName ?? Get.parameters['task'] ?? '').trim();
-        final groupNames = controller.groupsName.value;
+        final groupNames = controller.groupsName.value
+            .where(
+              (name) =>
+                  controller.groupsData.value[name]?.members
+                      .cast<ArgumentModel>()
+                      .any((field) => !field.uiHidden) ??
+                  false,
+            )
+            .toList();
         Map<String, dynamic>? layout;
         for (final group in controller.groupsData.value.values) {
           for (final argument in group.members.cast<ArgumentModel>()) {
@@ -225,6 +233,7 @@ class Args extends StatelessWidget {
     final result = <Widget>[const Divider()];
     for (int i = 0; i < groupsModel.members.length; i++) {
       final member = groupsModel.members[i] as ArgumentModel;
+      if (member.uiHidden) continue;
       result.add(
         ArgumentView(
           key: ValueKey<String>(

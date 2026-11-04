@@ -49,7 +49,7 @@ class _ApiFormSettingsState extends State<ApiFormSettings> {
 
   Widget input(String name, {String? label}) {
     final index = members.indexWhere((m) => m.title == name);
-    if (index < 0) return const SizedBox.shrink();
+    if (index < 0 || members[index].uiHidden) return const SizedBox.shrink();
     return ArgumentView(
       key: ValueKey(name),
       index: index,
@@ -144,6 +144,7 @@ class _ApiFormSettingsState extends State<ApiFormSettings> {
   Widget render(Map<String, dynamic> node, Set<String> handled) {
     final name = node['field'] as String?;
     final model = name == null ? null : field(name);
+    if (model?.uiHidden == true) return const SizedBox.shrink();
     final children = nodes(node['children']);
     switch (node['type']) {
       case 'field':
@@ -192,7 +193,7 @@ class _ApiFormSettingsState extends State<ApiFormSettings> {
         );
       case 'remaining':
         final remaining = members
-            .where((m) => !handled.contains(m.title))
+            .where((m) => !m.uiHidden && !handled.contains(m.title))
             .toList();
         final columns = (node['columns'] as int? ?? 1).clamp(1, 8);
         return Column(

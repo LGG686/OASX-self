@@ -228,7 +228,8 @@
           "description": "\u542f\u7528\u540e\u6309\u63a5\u53e3\u58f0\u660e\u7684\u9879\u76ee\u5408\u5e76\u914d\u7f6e\u5757\uff1b\u5173\u95ed\u540e\u9010\u5757\u663e\u793a\u5168\u90e8\u914d\u7f6e\u3002",
           "options": {}
         }
-      }
+      },
+      "ui_hidden": true
     }
   ],
   "scheduler": [

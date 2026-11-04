@@ -452,6 +452,7 @@ class GroupsModel {
 }
 
 class ArgumentModel {
+  final bool uiHidden;
   final Map<String, dynamic>? uiText;
   final dynamic uiGroupTitle;
   final List<dynamic>? uiForm;
@@ -493,6 +494,7 @@ class ArgumentModel {
     this.uiGroupTitle,
     this.uiForm,
     this.exclusiveGroups = const [],
+    this.uiHidden = false,
   });
 
   factory ArgumentModel.fromJson(Map<String, dynamic> json) {
@@ -508,6 +510,7 @@ class ArgumentModel {
           ? normalizeMultiEnumValue(json['value'])
           : json['value'],
       type: type,
+      uiHidden: json['ui_hidden'] == true,
       displayTitle: json['title'] as String?,
       uiText: json['ui_text'] is Map
           ? Map<String, dynamic>.from(json['ui_text'])
