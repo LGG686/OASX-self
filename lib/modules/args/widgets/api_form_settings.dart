@@ -8,25 +8,29 @@ class ApiFormSettings extends StatefulWidget {
     required this.group,
     required this.form,
     required this.onChanged,
+    this.argsController,
   });
   final String script;
   final String task;
   final GroupsModel group;
   final List<dynamic> form;
   final SetArgumentCallback onChanged;
+  final ArgsController? argsController;
 
   @override
   State<ApiFormSettings> createState() => _ApiFormSettingsState();
 }
 
 class _ApiFormSettingsState extends State<ApiFormSettings> {
+  ArgsController get _controller =>
+      widget.argsController ?? Get.find<ArgsController>();
   List<ArgumentModel> get members => widget.group.members.cast<ArgumentModel>();
   ArgumentModel? field(String name) =>
       members.firstWhereOrNull((m) => m.title == name);
   void save(String name, dynamic value) {
     final model = field(name);
     if (model == null) return;
-    final controller = Get.find<ArgsController>();
+    final controller = _controller;
     setState(() => model.value = value);
     if (controller.isDraftMode.value) {
       controller.stageArgumentChange(
@@ -59,6 +63,7 @@ class _ApiFormSettingsState extends State<ApiFormSettings> {
       setArgument: widget.onChanged,
       compact: true,
       label: label,
+      argsController: _controller,
     );
   }
 
@@ -83,10 +88,7 @@ class _ApiFormSettingsState extends State<ApiFormSettings> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: InputDecoration(
                 isDense: true,
-                errorText: Get.find<ArgsController>().fieldError(
-                  widget.group.groupName,
-                  name,
-                ),
+                errorText: _controller.fieldError(widget.group.groupName, name),
               ),
               onChanged: (value) {
                 final next = (field(name)?.value.toString() ?? '0').split(

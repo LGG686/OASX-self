@@ -45,6 +45,7 @@ class ArgsController extends GetxController {
     bool stagingMode = false,
     List<String> scopeScripts = const [],
     SaveArgumentCallback? saveArgumentOverride,
+    Map<String, dynamic>? initialGroups,
   }) async {
     _loadedConfig = config;
     _loadedTask = task;
@@ -57,7 +58,7 @@ class ArgsController extends GetxController {
 
     final groupsMap = <String, GroupsModel>{};
     final names = <String>[];
-    final json = await ApiClient().getScriptTask(config, task);
+    final json = initialGroups ?? await ApiClient().getScriptTask(config, task);
     for (final entry in json.entries) {
       names.add(entry.key);
       final arguments = <ArgumentModel>[];
@@ -456,6 +457,7 @@ class ArgumentModel {
   final Map<String, dynamic>? uiText;
   final dynamic uiGroupTitle;
   final List<dynamic>? uiForm;
+  final Map<String, dynamic>? uiTaskList;
   final List<List<String>> exclusiveGroups;
   Map get localized =>
       uiText?[Get.locale?.toString()] as Map? ?? uiText?['zh_CN'] as Map? ?? {};
@@ -493,6 +495,7 @@ class ArgumentModel {
     this.uiText,
     this.uiGroupTitle,
     this.uiForm,
+    this.uiTaskList,
     this.exclusiveGroups = const [],
     this.uiHidden = false,
   });
@@ -517,6 +520,9 @@ class ArgumentModel {
           : null,
       uiGroupTitle: json['ui_group_title'],
       uiForm: json['ui_form'] as List?,
+      uiTaskList: json['ui_task_list'] is Map
+          ? Map<String, dynamic>.from(json['ui_task_list'])
+          : null,
       exclusiveGroups: (json['ui_exclusive_groups'] as List? ?? [])
           .map((e) => List<String>.from(e))
           .toList(),

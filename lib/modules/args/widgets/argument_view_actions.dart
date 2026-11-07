@@ -2,8 +2,6 @@
 part of args;
 
 extension _ArgumentViewActions on _ArgumentViewState {
-  ArgsController get _argsController => Get.find<ArgsController>();
-
   bool get _isDraftMode => _argsController.isDraftMode.value;
 
   void onCheckboxChanged(bool? value) {

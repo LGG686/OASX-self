@@ -11,6 +11,7 @@ class ArgumentView extends StatefulWidget {
     this.taskName,
     this.compact = false,
     this.label,
+    this.argsController,
   }) : super(key: key);
 
   final SetArgumentCallback setArgument;
@@ -21,6 +22,7 @@ class ArgumentView extends StatefulWidget {
   final String? taskName;
   final bool compact;
   final String? label;
+  final ArgsController? argsController;
 
   @override
   State<ArgumentView> createState() => _ArgumentViewState();
@@ -33,12 +35,13 @@ class _ArgumentViewState extends State<ArgumentView> {
   late final FocusNode _focusNode;
 
   ArgumentModel get model {
-    final controller = Get.find<ArgsController>();
+    final controller = _argsController;
     final groupsModel = controller.groupsData.value[widget.getGroupName()];
     return groupsModel!.members[widget.index];
   }
 
-  ArgsController get _argsController => Get.find<ArgsController>();
+  ArgsController get _argsController =>
+      widget.argsController ?? Get.find<ArgsController>();
 
   bool get _isProtectedImmediateScheduleField {
     return widget.lockImmediateScheduling &&

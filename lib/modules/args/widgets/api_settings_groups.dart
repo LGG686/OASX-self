@@ -35,7 +35,7 @@ class _ApiSettingsGroupsState extends State<ApiSettingsGroups> {
       : [];
 
   List<Widget> sourceChildren(List<Map<String, dynamic>> sources) {
-    final controller = Get.find<ArgsController>();
+    final controller = widget.args._controller;
     final result = <Widget>[];
     for (final source in sources) {
       final name = source['name'] as String?;
@@ -70,6 +70,7 @@ class _ApiSettingsGroupsState extends State<ApiSettingsGroups> {
             setArgument:
                 widget.args.setArgumentOverride ?? controller.setArgument,
             label: labels[field] == null ? null : settingsText(labels[field]),
+            argsController: controller,
           ),
         );
       }

@@ -30,6 +30,7 @@ part 'widgets/argument_view_actions.dart';
 part 'widgets/multi_enum_dropdown.dart';
 part 'widgets/api_form_settings.dart';
 part 'widgets/api_settings_groups.dart';
+part 'widgets/api_task_list.dart';
 part 'controllers/args_controller.dart';
 
 typedef SetArgumentCallback =
@@ -77,6 +78,7 @@ class Args extends StatelessWidget {
     this.onGroupDragEnded,
     this.setArgumentOverride,
     this.onCancel,
+    this.argsController,
   }) : super(key: key);
 
   final String? scriptName;
@@ -90,114 +92,158 @@ class Args extends StatelessWidget {
   final VoidCallback? onGroupDragEnded;
   final SetArgumentCallback? setArgumentOverride;
   final Future<void> Function()? onCancel;
+  final ArgsController? argsController;
+
+  ArgsController get _controller =>
+      argsController ?? Get.find<ArgsController>();
 
   @override
   Widget build(BuildContext context) {
-    return GetX<ArgsController>(
-      builder: (controller) {
-        final selectedScript = (scriptName ?? Get.parameters['script'] ?? '')
-            .trim();
-        final selectedTask = (taskName ?? Get.parameters['task'] ?? '').trim();
-        final groupNames = controller.groupsName.value
-            .where(
-              (name) =>
-                  controller.groupsData.value[name]?.members
-                      .cast<ArgumentModel>()
-                      .any((field) => !field.uiHidden) ??
-                  false,
-            )
-            .toList();
-        Map<String, dynamic>? layout;
-        for (final group in controller.groupsData.value.values) {
-          for (final argument in group.members.cast<ArgumentModel>()) {
-            if (argument.value == true &&
-                argument.uiLayout?['version'] == 1 &&
-                argument.uiLayout?['sections'] is List) {
-              layout = argument.uiLayout;
-            }
+    return Obx(() {
+      final controller = _controller;
+      final selectedScript = (scriptName ?? Get.parameters['script'] ?? '')
+          .trim();
+      final selectedTask = (taskName ?? Get.parameters['task'] ?? '').trim();
+      final groupNames = controller.groupsName.value
+          .where(
+            (name) =>
+                controller.groupsData.value[name]?.members
+                    .cast<ArgumentModel>()
+                    .any((field) => !field.uiHidden) ??
+                false,
+          )
+          .toList();
+      final taskLists = <String, Map<String, dynamic>>{};
+      for (final name in groupNames) {
+        for (final model
+            in controller.groupsData.value[name]!.members
+                .cast<ArgumentModel>()) {
+          final data = model.uiTaskList;
+          if (data != null) {
+            taskLists[name] = model.value is Map
+                ? Map<String, dynamic>.from(model.value)
+                : data;
           }
         }
-        final content = LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                child: layout != null
-                    ? ApiSettingsGroups(
-                        args: this,
-                        script: selectedScript,
-                        task: selectedTask,
-                        groupNames: groupNames,
-                        layout: layout,
-                      )
-                    : ExpansionTileGroup(
-                        spaceBetweenItem: 10,
-                        children: groupNames
-                            .map(
-                              (name) => ExpansionTileItem(
-                                key: ValueKey<String>(
-                                  'args-group-$selectedScript-$selectedTask-$name',
-                                ),
-                                initiallyExpanded: true,
-                                isHasTopBorder: false,
-                                isHasBottomBorder: false,
-                                backgroundColor: _groupBackgroundColor(
-                                  context,
-                                  selectedScript,
-                                  selectedTask,
-                                  name,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                title:
-                                    <Widget>[
-                                      if (groupDraggable)
-                                        _buildGroupDragHandle(
-                                          context,
-                                          selectedScript,
-                                          selectedTask,
-                                          name,
-                                        ),
-                                      Text(_groupTitle(name)),
-                                    ].toRow(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                    ),
-                                children: _children(
-                                  groupName: name,
-                                  selectedScript: selectedScript,
-                                  selectedTask: selectedTask,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-              ),
-            );
-          },
-        );
-        if (!stagingMode) {
-          return content;
+      }
+      Map<String, dynamic>? layout;
+      for (final group in controller.groupsData.value.values) {
+        for (final argument in group.members.cast<ArgumentModel>()) {
+          if (argument.value == true &&
+              argument.uiLayout?['version'] == 1 &&
+              argument.uiLayout?['sections'] is List) {
+            layout = argument.uiLayout;
+          }
         }
-        return Column(
-          children: [
-            Expanded(child: content),
-            ArgsDraftBar(
-              scriptName: selectedScript,
-              taskName: selectedTask,
-              onCancel: onCancel,
+      }
+      final content = LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: layout != null
+                  ? ApiSettingsGroups(
+                      args: this,
+                      script: selectedScript,
+                      task: selectedTask,
+                      groupNames: groupNames,
+                      layout: layout,
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ExpansionTileGroup(
+                          spaceBetweenItem: 10,
+                          children: groupNames
+                              .where((name) => !taskLists.containsKey(name))
+                              .map(
+                                (name) => ExpansionTileItem(
+                                  key: ValueKey<String>(
+                                    'args-group-$selectedScript-$selectedTask-$name',
+                                  ),
+                                  initiallyExpanded: true,
+                                  isHasTopBorder: false,
+                                  isHasBottomBorder: false,
+                                  backgroundColor: _groupBackgroundColor(
+                                    context,
+                                    selectedScript,
+                                    selectedTask,
+                                    name,
+                                  ),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  title:
+                                      <Widget>[
+                                        if (groupDraggable)
+                                          _buildGroupDragHandle(
+                                            context,
+                                            selectedScript,
+                                            selectedTask,
+                                            name,
+                                          ),
+                                        Text(_groupTitle(name)),
+                                      ].toRow(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                      ),
+                                  children: _children(
+                                    groupName: name,
+                                    selectedScript: selectedScript,
+                                    selectedTask: selectedTask,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        for (final entry in taskLists.entries)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: ApiTaskList(
+                              key: ValueKey(
+                                '$selectedScript-$selectedTask-${entry.key}',
+                              ),
+                              title: _groupTitle(entry.key),
+                              script: selectedScript,
+                              task: selectedTask,
+                              data: entry.value,
+                              onChanged: (data) {
+                                controller.stageArgumentChange(
+                                  entry.key,
+                                  'task_list',
+                                  data,
+                                  'task_list',
+                                );
+                                controller.groupsData.refresh();
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
             ),
-          ],
-        );
-      },
-    );
+          );
+        },
+      );
+      if (!stagingMode) {
+        return content;
+      }
+      return Column(
+        children: [
+          Expanded(child: content),
+          ArgsDraftBar(
+            scriptName: selectedScript,
+            taskName: selectedTask,
+            onCancel: onCancel,
+          ),
+        ],
+      );
+    });
   }
 
   String _groupTitle(String name) {
-    final group = Get.find<ArgsController>().groupsData.value[name];
+    final group = _controller.groupsData.value[name];
     final title = group?.members
         .cast<ArgumentModel>()
         .map((m) => m.uiGroupTitle)
@@ -211,7 +257,7 @@ class Args extends StatelessWidget {
     required String selectedScript,
     required String selectedTask,
   }) {
-    final controller = Get.find<ArgsController>();
+    final controller = _controller;
     final setArgument = setArgumentOverride ?? controller.setArgument;
     final groupsModel = controller.groupsData.value[groupName]!;
     final form = groupsModel.members
@@ -227,6 +273,7 @@ class Args extends StatelessWidget {
           group: groupsModel,
           onChanged: setArgument,
           form: form,
+          argsController: controller,
         ),
       ];
     }
@@ -245,6 +292,7 @@ class Args extends StatelessWidget {
           getGroupName: groupsModel.getGroupName,
           lockImmediateScheduling: lockImmediateScheduling,
           index: i,
+          argsController: controller,
         ),
       );
     }
