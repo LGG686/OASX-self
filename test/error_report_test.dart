@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 import 'package:oasx/modules/log/log_browser_models.dart';
 import 'package:oasx/modules/log/models/error_report.dart';
 
@@ -24,6 +25,30 @@ ScriptErrorLogDetail detail(String text, {bool truncated = false}) =>
     );
 
 void main() {
+  test(
+    'remote task translations resolve headings even after earlier parsing',
+    () {
+      ErrorLogSummary.parse('[Task] Chess (Enable)');
+      Get.appendTranslations({
+        'zh_CN': {'MetaDemonTicket': '鬼王门票', 'ExplorationFight': '探索推进'},
+      });
+      try {
+        for (final task in ['MetaDemonTicket', 'ExplorationFight']) {
+          final text =
+              '${'═' * 40}\n${'─' * 15} ${task.toUpperCase()} ${'─' * 15}\n${'═' * 40}\nValueError: test';
+          expect(ErrorLogSummary.parse(text).task, task);
+          final report = buildErrorMarkdown(
+            detail(text),
+            [],
+            translate: (key) => Get.translations['zh_CN']?[key] ?? key,
+          );
+          expect(report, contains('任务：${Get.translations['zh_CN']![task]}'));
+        }
+      } finally {
+        Get.clearTranslations();
+      }
+    },
+  );
   test(
     'settings stay attached to the last error, not a later task heading',
     () {
