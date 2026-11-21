@@ -1,0 +1,67 @@
+name: Build Web
+
+# 构建网页版 OASX 供 OAS 容器服务端挂载在 /gui：
+# 产物同时作为 artifact 与滚动 tag oasx-web-latest 的 release 附件（oasx-web.zip）。
+# Builds the web flavor of OASX for the OAS container server to mount at /gui:
+# the bundle lands both as an artifact and on the rolling tag oasx-web-latest (oasx-web.zip).
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "self"
+    paths:
+      - "lib/**"
+      - "web/**"
+      - "pubspec.yaml"
+      - ".github/workflows/build-web.yml"
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: "3.35.1"
+
+jobs:
+  build:
+    name: Build web bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Pub get
+        run: flutter pub get
+
+      # 挂载路径是 /gui/，base-href 必须一致，静态资源才能按相对路径命中
+      # The bundle is mounted at /gui/, so --base-href must match for asset URLs to resolve.
+      - name: Build web
+        run: flutter build web --release --base-href /gui/
+
+      - name: Pack bundle
+        run: |
+          cd build/web
+          zip -qr ../../oasx-web.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasx-web
+          path: oasx-web.zip
+          retention-days: 14
+
+      - name: Publish to rolling release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view oasx-web-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create oasx-web-latest --repo "$GITHUB_REPOSITORY" \
+              --title "OASX Web" \
+              --notes "滚动更新的网页版构建，OAS 容器构建时从此处拉取。"
+          fi
+          gh release upload oasx-web-latest oasx-web.zip --repo "$GITHUB_REPOSITORY" --clobber
