@@ -112,9 +112,15 @@ class _ScriptAnalysisPanelState extends State<ScriptAnalysisPanel> {
               ? fileCompare
               : left.lineNo.compareTo(right.lineNo);
         });
-      final result = parseScriptAnalysis(lines, _dateKey);
+      final snapshots = parseScriptAnalysisByDates(lines, {
+        _dateKey,
+        ...trendDates,
+      });
+      final result =
+          snapshots[_dateKey] ?? const ScriptAnalysisSnapshot([]);
       final recentSnapshots = <String, ScriptAnalysisSnapshot>{
-        for (final date in trendDates) date: parseScriptAnalysis(lines, date),
+        for (final date in trendDates)
+          date: snapshots[date] ?? const ScriptAnalysisSnapshot([]),
       };
       if (!mounted || revision != _revision) return;
       setState(() {

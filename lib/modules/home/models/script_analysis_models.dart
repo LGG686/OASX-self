@@ -67,21 +67,33 @@ class ScriptAnalysisSnapshot {
   }
 }
 
-ScriptAnalysisSnapshot parseScriptAnalysis(
+final RegExp _fullTimestamp = RegExp(
+  r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})',
+);
+final RegExp _compactTimestamp = RegExp(r'^(\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})');
+final RegExp _clickPattern = RegExp(
+  r'Click\s+\(\s*(\d+),\s*(\d+)\)\s+@\s+(.+?)\s*$',
+);
+final RegExp _swipePattern = RegExp(
+  r'Swipe\s+\(\s*(\d+),\s*(\d+)\)\s*->\s*\(\s*(\d+),\s*(\d+)\)',
+);
+
+/// Parses one pass over [lines] and builds a snapshot per requested date.
+///
+/// The analysis panel needs the selected day plus the recent-trend days;
+/// running the previous per-date parse 8 times over the same lines compiled
+/// millions of regexes on the UI isolate and froze the app. One pass that
+/// files events into per-date buckets produces identical results because
+/// [LogTaskContext] advances over every line exactly as before.
+Map<String, ScriptAnalysisSnapshot> parseScriptAnalysisByDates(
   Iterable<ScriptLogLine> lines,
-  String dateKey, {
+  Set<String> dateKeys, {
   String? fallbackTask,
 }) {
-  final fullTimestamp = RegExp(
-    r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})',
-  );
-  final compactTimestamp = RegExp(r'^(\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})');
   final taskContext = LogTaskContext();
-  final clickPattern = RegExp(r'Click\s+\(\s*(\d+),\s*(\d+)\)\s+@\s+(.+?)\s*$');
-  final swipePattern = RegExp(
-    r'Swipe\s+\(\s*(\d+),\s*(\d+)\)\s*->\s*\(\s*(\d+),\s*(\d+)\)',
-  );
-  final events = <ScriptActionEvent>[];
+  final eventsByDate = <String, List<ScriptActionEvent>>{
+    for (final date in dateKeys) date: <ScriptActionEvent>[],
+  };
   for (final line in lines) {
     final fileDate = line.fileName.length >= 10
         ? line.fileName.substring(0, 10)
@@ -92,19 +104,21 @@ ScriptAnalysisSnapshot parseScriptAnalysis(
         taskContext.fallbackTask ??
         fallbackTask ??
         'Unknown';
-    if (fileDate != dateKey) continue;
-    final fullTimeMatch = fullTimestamp.firstMatch(line.text);
-    final compactTimeMatch = compactTimestamp.firstMatch(line.text);
-    final timestampText =
-        fullTimeMatch?.group(1) ??
-        (compactTimeMatch == null
+    final events = eventsByDate[fileDate];
+    if (events == null) continue;
+    final fullTimeMatch = _fullTimestamp.firstMatch(line.text);
+    final compactTimeMatch = fullTimeMatch == null
+        ? _compactTimestamp.firstMatch(line.text)
+        : null;
+    final timestampText = fullTimeMatch?.group(1) ??
+        (compactTimeMatch == null || fileDate.length < 4
             ? null
-            : '${dateKey.substring(0, 4)}-${compactTimeMatch.group(1)}');
+            : '${fileDate.substring(0, 4)}-${compactTimeMatch.group(1)}');
     final time = timestampText == null
         ? null
         : DateTime.tryParse(timestampText.replaceFirst(' ', 'T'));
     if (time == null) continue;
-    final click = clickPattern.firstMatch(line.text);
+    final click = _clickPattern.firstMatch(line.text);
     if (click != null) {
       events.add(
         ScriptActionEvent(
@@ -120,7 +134,7 @@ ScriptAnalysisSnapshot parseScriptAnalysis(
       );
       continue;
     }
-    final swipe = swipePattern.firstMatch(line.text);
+    final swipe = _swipePattern.firstMatch(line.text);
     if (swipe != null) {
       events.add(
         ScriptActionEvent(
@@ -136,5 +150,21 @@ ScriptAnalysisSnapshot parseScriptAnalysis(
       );
     }
   }
-  return ScriptAnalysisSnapshot(events);
+  return {
+    for (final entry in eventsByDate.entries)
+      entry.key: ScriptAnalysisSnapshot(entry.value),
+  };
+}
+
+ScriptAnalysisSnapshot parseScriptAnalysis(
+  Iterable<ScriptLogLine> lines,
+  String dateKey, {
+  String? fallbackTask,
+}) {
+  return parseScriptAnalysisByDates(
+    lines,
+    {dateKey},
+    fallbackTask: fallbackTask,
+  )[dateKey] ??
+  const ScriptAnalysisSnapshot([]);
 }
