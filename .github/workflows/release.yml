@@ -2,6 +2,27 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      build_windows:
+        description: "电脑版 (Windows exe)"
+        type: boolean
+        default: true
+      build_android:
+        description: "手机版 (Android APK)"
+        type: boolean
+        default: true
+      build_web:
+        description: "Web 版（发布 oasx-web-latest，供 App 网页控制台更新）"
+        type: boolean
+        default: false
+      release_tag:
+        description: "目标 release tag（如 v1.0.2；留空 = 只出 artifact，不建 release）"
+        required: false
+        default: ""
+      auto_publish:
+        description: "构建成功后自动发布 release（取消 draft 并标记 latest；tag push 恒为发布）"
+        type: boolean
+        default: false
   push:
     branches:
       - "master"
@@ -50,7 +71,8 @@ jobs:
 
   create_release:
     name: Create Release
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    # tag push 或手动构建填了 release_tag 时才建 release；否则只出 artifact。
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '') }}
     runs-on: ubuntu-latest
     outputs:
       tag_name: ${{ steps.meta.outputs.tag_name }}
@@ -72,6 +94,9 @@ jobs:
         shell: bash
         run: |
           tag_name="${GITHUB_REF_NAME}"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            tag_name="${{ inputs.release_tag }}"
+          fi
           version_core="${tag_name#v}"
           build_name="${version_core%%+*}"
           build_number="$(python -c 'import pathlib,re; print(re.search(r"^version:.*\+(\d+)", pathlib.Path("pubspec.yaml").read_text(), re.M).group(1))')"
@@ -109,6 +134,7 @@ jobs:
           if [[ "$PRERELEASE" == "true" ]]; then
             gh release create "$TAG_NAME" \
               --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
               --title "Release $TAG_NAME" \
               --notes-file CHANGELATEST.md \
               --draft \
@@ -116,6 +142,7 @@ jobs:
           else
             gh release create "$TAG_NAME" \
               --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
               --title "Release $TAG_NAME" \
               --notes-file CHANGELATEST.md \
               --draft
@@ -123,7 +150,8 @@ jobs:
 
   build_windows:
     name: Build Windows
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    # tag push 恒建；手动构建按 input 开关。
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.build_windows == true }}
     runs-on: windows-2022
     needs: create_release
     steps:
@@ -236,6 +264,14 @@ jobs:
           "asset_name=$assetName" >> $env:GITHUB_OUTPUT
           "asset_path=$assetPath" >> $env:GITHUB_OUTPUT
 
+      - name: Upload Windows artifact (no release build)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag == '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasx-windows
+          path: ${{ steps.package.outputs.asset_path }}
+          retention-days: 14
+
       - name: Upload Windows asset
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
@@ -248,7 +284,8 @@ jobs:
 
   build_android:
     name: Build Android
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    # tag push 恒建；手动构建按 input 开关。
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.build_android == true }}
     runs-on: ubuntu-latest
     needs: create_release
     steps:
@@ -309,6 +346,14 @@ jobs:
             "${release_dir}/oasx_${TAG_NAME}_arm64-v8a.apk"
           echo "release_dir=$release_dir" >> "$GITHUB_OUTPUT"
 
+      - name: Upload Android artifacts (no release build)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag == '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: oasx-android-apks
+          path: ${{ steps.prepare_android_assets.outputs.release_dir }}/*.apk
+          retention-days: 14
+
       - name: Upload Android assets
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
@@ -321,9 +366,64 @@ jobs:
               --repo "$GITHUB_REPOSITORY" --clobber
           done
 
+  build_web:
+    name: Build Web (oasx-web-latest)
+    # Web 包与 release tag 无关：单独构建并滚动覆盖 oasx-web-latest，
+    # OAS 容器与 App 网页控制台更新通道都从这里拉取。
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_web == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+          pub-cache: true
+
+      - name: Pub get
+        run: flutter pub get
+
+      # 挂载路径是 /gui/，base-href 必须一致，静态资源才能按相对路径命中
+      - name: Build web
+        run: flutter build web --release --base-href /gui/
+
+      - name: Pack bundle
+        run: |
+          cd build/web
+          zip -qr ../../oasx-web.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oasx-web
+          path: oasx-web.zip
+          retention-days: 14
+
+      - name: Publish to rolling release
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+        run: |
+          if ! gh release view oasx-web-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create oasx-web-latest --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "OASX Web" \
+              --notes "滚动更新的网页版构建，OAS 容器构建时从此处拉取。"
+          fi
+          gh release upload oasx-web-latest oasx-web.zip --repo "$GITHUB_REPOSITORY" --clobber
+
   publish_release:
     name: Publish verified release
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    # tag push 恒发布；手动构建仅在勾选 auto_publish 时发布。
+    if: >-
+      ${{ !cancelled() &&
+          needs.create_release.result == 'success' &&
+          (needs.build_windows.result == 'success' || needs.build_windows.result == 'skipped') &&
+          (needs.build_android.result == 'success' || needs.build_android.result == 'skipped') &&
+          (needs.build_windows.result == 'success' || needs.build_android.result == 'success') &&
+          (startsWith(github.ref, 'refs/tags/v') || inputs.auto_publish == true) }}
     runs-on: ubuntu-latest
     needs: [create_release, build_windows, build_android]
     steps:
@@ -331,6 +431,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
           TAG_NAME: ${{ needs.create_release.outputs.tag_name }}
+          BUILD_WINDOWS: ${{ needs.build_windows.result }}
+          BUILD_ANDROID: ${{ needs.build_android.result }}
         shell: bash
         run: |
           gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY" --json assets > release-assets.json
@@ -339,12 +441,16 @@ jobs:
           import os
           from pathlib import Path
           tag = os.environ['TAG_NAME']
-          expected = {f'oasx_{tag}_windows.zip', f'oasx_{tag}_armeabi-v7a.apk', f'oasx_{tag}_arm64-v8a.apk'}
+          expected = set()
+          if os.environ['BUILD_WINDOWS'] == 'success':
+              expected.add(f'oasx_{tag}_windows.zip')
+          if os.environ['BUILD_ANDROID'] == 'success':
+              expected.update({f'oasx_{tag}_armeabi-v7a.apk', f'oasx_{tag}_arm64-v8a.apk'})
           assets = json.loads(Path('release-assets.json').read_text())['assets']
           actual = {asset['name'] for asset in assets if asset['size'] > 0}
           missing = expected - actual
           if missing:
               raise SystemExit(f'Missing release assets: {sorted(missing)}')
-          print('Verified all Windows and Android release assets')
+          print('Verified release assets:', sorted(expected))
           PY
           gh release edit "$TAG_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
