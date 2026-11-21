@@ -3,31 +3,14 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      build_windows:
-        description: "电脑版 (Windows exe)"
-        type: boolean
-        default: true
-      build_android:
-        description: "手机版 (Android APK)"
-        type: boolean
-        default: true
-      build_web:
-        description: "Web 版（发布 oasx-web-latest，供 App 网页控制台更新）"
-        type: boolean
-        default: false
       release_tag:
-        description: "目标 release tag（如 v1.0.2；留空 = 只出 artifact，不建 release）"
+        description: "发行版 tag（如 v1.0.2；勾选发布时必填，不填只出 artifact）"
         required: false
         default: ""
       auto_publish:
-        description: "构建成功后自动发布 release（取消 draft 并标记 latest；tag push 恒为发布）"
+        description: "构建成功后发布发行版（电脑+手机+Web 一起）；不勾选只出 artifact"
         type: boolean
         default: false
-  push:
-    branches:
-      - "master"
-    tags:
-      - "v*"
 
 permissions:
   contents: write
@@ -39,47 +22,16 @@ env:
   PYTHON_VERSION: "3.12"
 
 jobs:
-  warm_flutter_cache:
-    name: Warm Flutter Cache (Windows)
-    if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-    runs-on: windows-2022
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Flutter
-        id: flutter-action
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-          pub-cache: true
-
-      - name: Warm pub cache
-        if: steps.flutter-action.outputs.PUB-CACHE-HIT != 'true'
-        shell: bash
-        run: flutter pub get
-
-      - name: Report Flutter cache status
-        shell: bash
-        run: |
-          echo "Flutter cache key: ${{ steps.flutter-action.outputs.CACHE-KEY }}"
-          echo "Flutter cache hit: ${{ steps.flutter-action.outputs.CACHE-HIT }}"
-          echo "Pub cache key: ${{ steps.flutter-action.outputs.PUB-CACHE-KEY }}"
-          echo "Pub cache hit: ${{ steps.flutter-action.outputs.PUB-CACHE-HIT }}"
-
   create_release:
-    name: Create Release
-    # tag push 或手动构建填了 release_tag 时才建 release；否则只出 artifact。
-    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '') }}
+    name: Release metadata
+    # 恒跑：为三个构建 job 提供 build_name/build_number；
+    # 仅在勾选 auto_publish 且填了 release_tag 时才创建 release。
     runs-on: ubuntu-latest
     outputs:
-      tag_name: ${{ steps.meta.outputs.tag_name }}
       build_name: ${{ steps.meta.outputs.build_name }}
       build_number: ${{ steps.meta.outputs.build_number }}
-      version: ${{ steps.meta.outputs.version }}
-      prerelease: ${{ steps.meta.outputs.prerelease }}
+      asset_tag: ${{ steps.meta.outputs.asset_tag }}
+      do_release: ${{ steps.meta.outputs.do_release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -93,36 +45,45 @@ jobs:
         id: meta
         shell: bash
         run: |
-          tag_name="${GITHUB_REF_NAME}"
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            tag_name="${{ inputs.release_tag }}"
-          fi
-          version_core="${tag_name#v}"
-          build_name="${version_core%%+*}"
-          build_number="$(python -c 'import pathlib,re; print(re.search(r"^version:.*\+(\d+)", pathlib.Path("pubspec.yaml").read_text(), re.M).group(1))')"
-          prerelease="false"
-
-          if [[ "$tag_name" == *-* ]]; then
+          tag_name="${{ inputs.release_tag }}"
+          if [[ -n "$tag_name" ]]; then
+            version_core="${tag_name#v}"
+            build_name="${version_core%%+*}"
+            build_number="$(python -c 'import pathlib,re; print(re.search(r"^version:.*\+(\d+)", pathlib.Path("pubspec.yaml").read_text(), re.M).group(1))')"
+            prerelease="false"
+            if [[ "$tag_name" == *-* ]]; then
+              build_number="${GITHUB_RUN_NUMBER}"
+              prerelease="true"
+            fi
+            do_release="true"
+          else
+            # 不发布：版本号取 pubspec，构建号用本次 run，产物名带 run 号区分
+            version_line="$(python -c 'import pathlib,re; print(re.search(r"^version:\s*(\S+)", pathlib.Path("pubspec.yaml").read_text(), re.M).group(1))')"
+            build_name="${version_line%%+*}"
             build_number="${GITHUB_RUN_NUMBER}"
             prerelease="true"
+            do_release="false"
           fi
+          asset_tag="${tag_name:-build-${GITHUB_RUN_NUMBER}}"
 
           {
-            echo "tag_name=$tag_name"
             echo "build_name=$build_name"
             echo "build_number=$build_number"
-            echo "version=$build_name+$build_number"
+            echo "asset_tag=$asset_tag"
             echo "prerelease=$prerelease"
+            echo "do_release=$do_release"
           } >> "$GITHUB_OUTPUT"
 
       - name: Extract latest changelog
+        if: steps.meta.outputs.do_release == 'true'
         shell: bash
         run: python ./script/extract_changelog.py
 
-      - name: Create release if needed
+      - name: Create release
+        if: steps.meta.outputs.do_release == 'true'
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
-          TAG_NAME: ${{ steps.meta.outputs.tag_name }}
+          TAG_NAME: ${{ inputs.release_tag }}
           PRERELEASE: ${{ steps.meta.outputs.prerelease }}
         shell: bash
         run: |
@@ -150,8 +111,6 @@ jobs:
 
   build_windows:
     name: Build Windows
-    # tag push 恒建；手动构建按 input 开关。
-    if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.build_windows == true }}
     runs-on: windows-2022
     needs: create_release
     steps:
@@ -245,14 +204,14 @@ jobs:
           if (!(Test-Path $releasePath)) {
             $releasePath = Join-Path $env:GITHUB_WORKSPACE 'build/windows/runner/Release'
           }
-          $assetName = "oasx_${{ needs.create_release.outputs.tag_name }}_windows.zip"
+          $assetName = "oasx_${{ needs.create_release.outputs.asset_tag }}_windows.zip"
           $assetPath = Join-Path $env:GITHUB_WORKSPACE $assetName
           if (Test-Path $assetPath) {
             Remove-Item $assetPath -Force
           }
           Compress-Archive -Path (Join-Path $releasePath '*') -DestinationPath $assetPath
           # Ship an empty pictures directory, without sample images/placeholders.
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          Add-Type -AssemblyName System.IO.Compression.ZipFile
           $archive = [System.IO.Compression.ZipFile]::Open($assetPath, [System.IO.Compression.ZipArchiveMode]::Update)
           try {
             if ($null -eq $archive.GetEntry('pictures/')) {
@@ -265,7 +224,7 @@ jobs:
           "asset_path=$assetPath" >> $env:GITHUB_OUTPUT
 
       - name: Upload Windows artifact (no release build)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag == '' }}
+        if: needs.create_release.outputs.do_release != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: oasx-windows
@@ -273,19 +232,18 @@ jobs:
           retention-days: 14
 
       - name: Upload Windows asset
+        if: needs.create_release.outputs.do_release == 'true'
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         shell: pwsh
         run: |
-          gh release upload "${{ needs.create_release.outputs.tag_name }}" `
+          gh release upload "${{ inputs.release_tag }}" `
             "${{ steps.package.outputs.asset_path }}" `
             --repo "$env:GITHUB_REPOSITORY" `
             --clobber
 
   build_android:
     name: Build Android
-    # tag push 恒建；手动构建按 input 开关。
-    if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.build_android == true }}
     runs-on: ubuntu-latest
     needs: create_release
     steps:
@@ -335,19 +293,19 @@ jobs:
       - name: Prepare Android release assets
         id: prepare_android_assets
         env:
-          TAG_NAME: ${{ needs.create_release.outputs.tag_name }}
+          ASSET_TAG: ${{ needs.create_release.outputs.asset_tag }}
         shell: bash
         run: |
           release_dir="build/app/outputs/github-release"
           mkdir -p "$release_dir"
           cp "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk" \
-            "${release_dir}/oasx_${TAG_NAME}_armeabi-v7a.apk"
+            "${release_dir}/oasx_${ASSET_TAG}_armeabi-v7a.apk"
           cp "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" \
-            "${release_dir}/oasx_${TAG_NAME}_arm64-v8a.apk"
+            "${release_dir}/oasx_${ASSET_TAG}_arm64-v8a.apk"
           echo "release_dir=$release_dir" >> "$GITHUB_OUTPUT"
 
       - name: Upload Android artifacts (no release build)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag == '' }}
+        if: needs.create_release.outputs.do_release != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: oasx-android-apks
@@ -355,23 +313,24 @@ jobs:
           retention-days: 14
 
       - name: Upload Android assets
+        if: needs.create_release.outputs.do_release == 'true'
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
-          TAG_NAME: ${{ needs.create_release.outputs.tag_name }}
+          ASSET_TAG: ${{ needs.create_release.outputs.asset_tag }}
         shell: bash
         run: |
           for abi in armeabi-v7a arm64-v8a; do
-            gh release upload "$TAG_NAME" \
-              "${{ steps.prepare_android_assets.outputs.release_dir }}/oasx_${TAG_NAME}_${abi}.apk" \
+            gh release upload "${{ inputs.release_tag }}" \
+              "${{ steps.prepare_android_assets.outputs.release_dir }}/oasx_${ASSET_TAG}_${abi}.apk" \
               --repo "$GITHUB_REPOSITORY" --clobber
           done
 
   build_web:
-    name: Build Web (oasx-web-latest)
-    # Web 包与 release tag 无关：单独构建并滚动覆盖 oasx-web-latest，
-    # OAS 容器与 App 网页控制台更新通道都从这里拉取。
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_web == true }}
+    name: Build Web
+    # Web 包与 release tag 无关：恒构建并滚动覆盖 oasx-web-latest，
+    # OAS 容器与 App 网页控制台更新通道都从这里拉取；发布时顺带挂进 release。
     runs-on: ubuntu-latest
+    needs: create_release
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -414,25 +373,32 @@ jobs:
           fi
           gh release upload oasx-web-latest oasx-web.zip --repo "$GITHUB_REPOSITORY" --clobber
 
+      - name: Upload web asset to release
+        if: needs.create_release.outputs.do_release == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+        run: |
+          gh release upload "${{ inputs.release_tag }}" \
+            oasx-web.zip --repo "$GITHUB_REPOSITORY" --clobber
+
   publish_release:
     name: Publish verified release
-    # tag push 恒发布；手动构建仅在勾选 auto_publish 时发布。
+    # 仅勾选 auto_publish 且三个构建全部成功时发布。
     if: >-
       ${{ !cancelled() &&
+          needs.create_release.outputs.do_release == 'true' &&
           needs.create_release.result == 'success' &&
-          (needs.build_windows.result == 'success' || needs.build_windows.result == 'skipped') &&
-          (needs.build_android.result == 'success' || needs.build_android.result == 'skipped') &&
-          (needs.build_windows.result == 'success' || needs.build_android.result == 'success') &&
-          (startsWith(github.ref, 'refs/tags/v') || inputs.auto_publish == true) }}
+          needs.build_windows.result == 'success' &&
+          needs.build_android.result == 'success' &&
+          needs.build_web.result == 'success' &&
+          inputs.auto_publish == true }}
     runs-on: ubuntu-latest
-    needs: [create_release, build_windows, build_android]
+    needs: [create_release, build_windows, build_android, build_web]
     steps:
       - name: Verify assets and publish
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
-          TAG_NAME: ${{ needs.create_release.outputs.tag_name }}
-          BUILD_WINDOWS: ${{ needs.build_windows.result }}
-          BUILD_ANDROID: ${{ needs.build_android.result }}
+          TAG_NAME: ${{ inputs.release_tag }}
         shell: bash
         run: |
           gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY" --json assets > release-assets.json
@@ -441,11 +407,12 @@ jobs:
           import os
           from pathlib import Path
           tag = os.environ['TAG_NAME']
-          expected = set()
-          if os.environ['BUILD_WINDOWS'] == 'success':
-              expected.add(f'oasx_{tag}_windows.zip')
-          if os.environ['BUILD_ANDROID'] == 'success':
-              expected.update({f'oasx_{tag}_armeabi-v7a.apk', f'oasx_{tag}_arm64-v8a.apk'})
+          expected = {
+              f'oasx_{tag}_windows.zip',
+              f'oasx_{tag}_armeabi-v7a.apk',
+              f'oasx_{tag}_arm64-v8a.apk',
+              'oasx-web.zip',
+          }
           assets = json.loads(Path('release-assets.json').read_text())['assets']
           actual = {asset['name'] for asset in assets if asset['size'] > 0}
           missing = expected - actual
