@@ -355,6 +355,25 @@ jobs:
           cd build/web
           zip -qr ../../oasx-web.zip .
 
+      - name: Write web metadata
+        # 生成一份小的构建元数据，与网页包同时上传；App 检查更新只拉它，不下载整个网页包。
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          web = pathlib.Path("build/web")
+          version = json.loads((web / "version.json").read_text())
+          build_id = (web / ".last_build_id").read_text().strip()
+          meta = {
+              "version": version.get("version", ""),
+              "build_number": str(version.get("build_number", "")),
+              "build_id": build_id,
+              "sha": subprocess.run(
+                  ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True
+              ).stdout.strip(),
+          }
+          pathlib.Path("oasx-web.meta.json").write_text(json.dumps(meta))
+          PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: oasx-web
@@ -371,7 +390,7 @@ jobs:
               --title "OASX Web" \
               --notes "滚动更新的网页版构建，OAS 容器构建时从此处拉取。"
           fi
-          gh release upload oasx-web-latest oasx-web.zip --repo "$GITHUB_REPOSITORY" --clobber
+          gh release upload oasx-web-latest oasx-web.zip oasx-web.meta.json --repo "$GITHUB_REPOSITORY" --clobber
 
       - name: Upload web asset to release
         if: needs.create_release.outputs.do_release == 'true'
